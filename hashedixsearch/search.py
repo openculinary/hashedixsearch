@@ -120,54 +120,67 @@ def execute_query_exact(index, term):
             return doc_id
 
 
+def ngram_to_term(ngram, stemmer, analyzer):
+    text = " ".join(ngram)
+    return next(tokenize(doc=text, stemmer=stemmer, analyzer=analyzer))
+
+
+def find_best_match(ngram, terms):
+    best = (None, 0)
+    for term, n in terms.items():
+        if len(ngram) < n:
+            continue
+        matches = True
+        for idx, subterm in enumerate(term):
+            matches = matches and ngram[idx] == subterm
+        if matches and n > best[1]:
+            best = (term, n)
+    return best
+
+
 def highlight(query, terms, stemmer, analyzer):
+    terms = {
+        term: len(term)
+        for term in terms
+    }
+    max_n = max(n for n in terms.values())
 
-    # Marked-up representation of the original query
-    markup = ""
-    for term in terms:
+    # Generate unstemmed ngrams of the maximum term length
+    ngrams = []
+    for tokens in tokenize(doc=query, ngrams=max_n, analyzer=analyzer):
+        if len(tokens) < max_n:
+            break
+        ngrams.append(tokens)
 
-        # Generate unstemmed ngrams of the same length as each query term
-        remaining_tokens = []
-        n = len(term)
-        tag = 0
-        for tokens in tokenize(doc=query, ngrams=n, analyzer=analyzer):
+    # Tail the ngram list with ngrams of decreasing length
+    final_ngram = ngrams[-1]
+    for n in range(0, max_n):
+        ngrams.append(final_ngram[n + 1:])
 
-            # When full-length tokens are depleted, consume leftover tokens
-            if len(tokens) < n and len(remaining_tokens) > 0:
-                tokens = remaining_tokens
+    # Build up a marked-up representation of the original query
+    tag = 0
+    markup = ''
+    for ngram in ngrams:
 
-            # Advance through the text, and close tags when they are complete
-            tag -= 1
-            if tag == 0:
-                markup += "</mark>"
+        # Advance through the text closing tags after their words are consumed
+        tag -= 1
+        if tag == 0:
+            markup += "</mark>"
 
-            # Close a currently-open tag if we have consumed all tokens
-            if len(tokens) < n and tag > 0:
-                markup += f' {" ".join(tokens[:tag])}'
-                markup += "</mark>"
-                tokens = tokens[tag:]
-
-            # Write remaining entries to the output when tokens are depleted
-            if len(tokens) < n:
-                markup += f' {" ".join(tokens)}'
-                break
-
+        # Stop when we reach an empty end-of-stream ngram
+        if not ngram:
+            break
+        if markup:
             markup += " "
 
-            # Stem the original text to allow match equality comparsion
-            text = " ".join(tokens)
-            for stemmed_tokens in tokenize(
-                doc=text, ngrams=n, stemmer=stemmer, analyzer=analyzer
-            ):
-                break
+        # Determine whether any of the highlighting terms match
+        ngram_term = ngram_to_term(ngram, stemmer, analyzer)
+        term, n = find_best_match(ngram_term, terms)
 
-            # Open a tag marker when we find a matching term
-            if stemmed_tokens == term:
-                markup += f"<mark>"
-                tag = n
+        # Begin markup if a match was found, and consume the next word token
+        if term:
+            markup += f"<mark>"
+            tag = n
+        markup += f"{ngram[0]}"
 
-            # Append the next consumed original token when we do not
-            markup += f"{tokens[0]}"
-            remaining_tokens = tokens[1:]
-
-    return markup.strip()
+    return markup
