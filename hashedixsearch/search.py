@@ -46,7 +46,9 @@ def tokenize(doc, stopwords=None, ngrams=None, stemmer=None, analyzer=None):
     ngrams = max(ngrams, 1)
 
     for ngrams in range(ngrams, 0, -1):
-        for term in word_tokenize(doc, stopwords, ngrams, stemmer=stemmer):
+        for term in word_tokenize(
+            doc, stopwords, ngrams, stemmer=stemmer, ignore_numeric=False
+        ):
             yield term
 
     # Produce an end-of-stream marker
@@ -139,10 +141,7 @@ def find_best_match(ngram, terms):
 
 
 def highlight(query, terms, stemmer, analyzer):
-    terms = {
-        term: len(term)
-        for term in terms
-    }
+    terms = {term: len(term) for term in terms}
     max_n = max(n for n in terms.values())
 
     # Generate unstemmed ngrams of the maximum term length
@@ -155,11 +154,11 @@ def highlight(query, terms, stemmer, analyzer):
     # Tail the ngram list with ngrams of decreasing length
     final_ngram = ngrams[-1]
     for n in range(0, max_n):
-        ngrams.append(final_ngram[n + 1:])
+        ngrams.append(final_ngram[n + 1 :])
 
     # Build up a marked-up representation of the original query
     tag = 0
-    markup = ''
+    markup = ""
     for ngram in ngrams:
 
         # Advance through the text closing tags after their words are consumed
