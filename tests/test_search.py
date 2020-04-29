@@ -135,3 +135,16 @@ def test_phrase_multi_term_highlighting():
     markup = highlight(doc, terms, stemmer, analyzer)
 
     assert markup == expected
+
+
+def test_phrase_multi_term_highlighting_extra():
+    doc = "put the kebab skewers in the pan"
+    terms = [("kebab", "skewer",), ("pan",)]
+    expected = "put the <mark>kebab skewers</mark> in the <mark>pan</mark>"
+
+    stemmer = NaivePluralStemmer()
+    analyzer = NullAnalyzer()
+
+    markup = highlight(doc, terms, stemmer, analyzer)
+
+    assert markup == expected
