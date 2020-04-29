@@ -123,36 +123,41 @@ def execute_query_exact(index, term):
 def highlight(query, terms, stemmer, analyzer):
 
     # Marked-up representation of the original query
-    markup = ""
-    for term in terms:
+    markup = ''
+    terms = {
+        term: len(term)
+        for term in terms
+    }
+    max_n = max(n for n in terms.values())
 
-        # Generate unstemmed ngrams of the same length as each query term
-        remaining_tokens = []
-        n = len(term)
-        tag = 0
-        for tokens in tokenize(doc=query, ngrams=n, analyzer=analyzer):
+    # Generate unstemmed ngrams of the same length as each query term
+    remaining_tokens = []
+    tag = 0
+    for tokens in tokenize(doc=query, ngrams=max_n, analyzer=analyzer):
 
-            # When full-length tokens are depleted, consume leftover tokens
-            if len(tokens) < n and len(remaining_tokens) > 0:
-                tokens = remaining_tokens
+        # When full-length tokens are depleted, consume leftover tokens
+        if len(tokens) < max_n and len(remaining_tokens) > 0:
+            tokens = remaining_tokens
 
-            # Advance through the text, and close tags when they are complete
-            tag -= 1
-            if tag == 0:
-                markup += "</mark>"
+        # Advance through the text, and close tags when they are complete
+        tag -= 1
+        if tag == 0:
+            markup += "</mark>"
 
-            # Close a currently-open tag if we have consumed all tokens
-            if len(tokens) < n and tag > 0:
-                markup += f' {" ".join(tokens[:tag])}'
-                markup += "</mark>"
-                tokens = tokens[tag:]
+        # Close a currently-open tag if we have consumed all tokens
+        if len(tokens) < max_n and tag > 0:
+            markup += f' {" ".join(tokens[:tag])}'
+            markup += "</mark>"
+            tokens = tokens[tag:]
 
-            # Write remaining entries to the output when tokens are depleted
-            if len(tokens) < n:
-                markup += f' {" ".join(tokens)}'
-                break
+        # Write remaining entries to the output when tokens are depleted
+        if len(tokens) < max_n:
+            markup += f' {" ".join(tokens)}'
+            break
 
-            markup += " "
+        markup += " "
+
+        for term, n in terms.items():
 
             # Stem the original text to allow match equality comparsion
             text = " ".join(tokens)
@@ -165,9 +170,10 @@ def highlight(query, terms, stemmer, analyzer):
             if stemmed_tokens == term:
                 markup += f"<mark>"
                 tag = n
+                break
 
-            # Append the next consumed original token when we do not
-            markup += f"{tokens[0]}"
-            remaining_tokens = tokens[1:]
+        # Append the next consumed original token when we do not
+        markup += f"{tokens[0]}"
+        remaining_tokens = tokens[1:]
 
     return markup.strip()
