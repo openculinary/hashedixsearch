@@ -18,6 +18,16 @@ class NaivePluralStemmer(NullStemmer):
         return word.rstrip("s")
 
 
+class RetainNumbersAnalyzer(WhitespaceTokenAnalyzer):
+    def analyze_token(self, word):
+        yield word
+
+
+class RetainPunctuationAnalyzer(WhitespaceTokenAnalyzer):
+    def analyze_token(self, word):
+        yield word
+
+
 def test_tokenize_stopwords():
     doc = "red bell pepper diced"
     stopwords = ["diced"]
@@ -144,6 +154,31 @@ def test_phrase_multi_term_highlighting_extra():
 
     stemmer = NaivePluralStemmer()
     analyzer = WhitespaceTokenAnalyzer()
+
+    markup = highlight(doc, terms, stemmer, analyzer)
+
+    assert markup == expected
+
+
+def test_retain_numbers():
+    doc = "preheat the oven to 300 degrees"
+    terms = [("oven",), ("300",)]
+    expected = "preheat the <mark>oven</mark> to <mark>300</mark> degrees"
+
+    analyzer = RetainNumbersAnalyzer()
+
+    markup = highlight(doc, terms, stemmer=None, analyzer=analyzer)
+
+    assert markup == expected
+
+
+def test_retained_style():
+    doc = "Sentence one, oven.  Phrase two: pan."
+    terms = [("oven",), ("pan",)]
+    expected = "Sentence one, <mark>oven</mark>. Phrase two: <mark>pan</mark>."
+
+    stemmer = NaivePluralStemmer()
+    analyzer = RetainPunctuationAnalyzer()
 
     markup = highlight(doc, terms, stemmer, analyzer)
 
