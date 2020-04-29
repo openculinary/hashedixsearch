@@ -8,7 +8,7 @@ from hashedindex.textparser import (
 )
 
 
-class NullAnalyzer:
+class WhitespaceTokenAnalyzer:
 
     remove_punctuation = str.maketrans("", "", punctuation)
 
@@ -22,7 +22,7 @@ class NullAnalyzer:
         yield token
 
 
-class SynonymAnalyzer(NullAnalyzer):
+class SynonymAnalyzer(WhitespaceTokenAnalyzer):
     def __init__(self, synonyms):
         self.synonyms = synonyms
 
@@ -35,7 +35,7 @@ class SynonymAnalyzer(NullAnalyzer):
 def tokenize(doc, stopwords=None, ngrams=None, stemmer=None, analyzer=None):
     stopwords = stopwords or []
     stemmer = stemmer or NullStemmer()
-    analyzer = analyzer or NullAnalyzer()
+    analyzer = analyzer or WhitespaceTokenAnalyzer()
 
     words = list(analyzer.process(doc))
     word_count = len(words)

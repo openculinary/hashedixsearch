@@ -6,9 +6,9 @@ from hashedixsearch import (
     execute_query_exact,
     highlight,
     tokenize,
-    NullAnalyzer,
     NullStemmer,
     SynonymAnalyzer,
+    WhitespaceTokenAnalyzer,
 )
 
 
@@ -39,7 +39,7 @@ def test_token_stemming():
 def test_null_analyzer_tokenization():
     doc = "coriander, chopped"
 
-    analyzer = NullAnalyzer()
+    analyzer = WhitespaceTokenAnalyzer()
     tokens = list(analyzer.process(doc))
 
     assert tokens == ["coriander", "chopped"]
@@ -105,7 +105,7 @@ def test_highlighting():
     term = ("onion",)
 
     stemmer = NaivePluralStemmer()
-    analyzer = NullAnalyzer()
+    analyzer = WhitespaceTokenAnalyzer()
 
     markup = highlight(doc, [term], stemmer, analyzer)
 
@@ -117,7 +117,7 @@ def test_phrase_term_highlighting():
     term = ("baked", "bean")
 
     stemmer = NaivePluralStemmer()
-    analyzer = NullAnalyzer()
+    analyzer = WhitespaceTokenAnalyzer()
 
     markup = highlight(doc, [term], stemmer, analyzer)
 
@@ -130,7 +130,7 @@ def test_phrase_multi_term_highlighting():
     expected = "put the <mark>skewers</mark> in the <mark>frying pan</mark>"
 
     stemmer = NaivePluralStemmer()
-    analyzer = NullAnalyzer()
+    analyzer = WhitespaceTokenAnalyzer()
 
     markup = highlight(doc, terms, stemmer, analyzer)
 
@@ -143,7 +143,7 @@ def test_phrase_multi_term_highlighting_extra():
     expected = "put the <mark>kebab skewers</mark> in the <mark>pan</mark>"
 
     stemmer = NaivePluralStemmer()
-    analyzer = NullAnalyzer()
+    analyzer = WhitespaceTokenAnalyzer()
 
     markup = highlight(doc, terms, stemmer, analyzer)
 
