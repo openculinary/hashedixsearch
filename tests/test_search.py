@@ -18,11 +18,6 @@ class NaivePluralStemmer(NullStemmer):
         return word.rstrip("s")
 
 
-class RetainNumbersAnalyzer(WhitespaceTokenAnalyzer):
-    def analyze_token(self, word):
-        yield word
-
-
 class RetainPunctuationAnalyzer(WhitespaceTokenAnalyzer):
     def analyze_token(self, word):
         yield word
@@ -165,9 +160,7 @@ def test_retain_numbers():
     terms = [("oven",), ("300",)]
     expected = "preheat the <mark>oven</mark> to <mark>300</mark> degrees"
 
-    analyzer = RetainNumbersAnalyzer()
-
-    markup = highlight(doc, terms, stemmer=None, analyzer=analyzer)
+    markup = highlight(doc, terms, stemmer=None, analyzer=None)
 
     assert markup == expected
 
