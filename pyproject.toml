@@ -1,0 +1,21 @@
+[tool.poetry]
+authors = [
+    "James Addison <james@reciperadar.com>",
+]
+classifiers=[
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)"
+]
+description = "in-process search-engine for python"
+license = "AGPL-3.0-or-later"
+name = "hashedixsearch"
+repository = "https://github.com/openculinary/hashedixsearch/"
+version = "0.1"
+
+[tool.poetry.dependencies]
+hashedindex = "^0.6.0"
+python = "^3.7"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.4.1"
+black = "^19.10b0"
+flake8 = "^3.7.9"
