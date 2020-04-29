@@ -8,7 +8,7 @@ from hashedindex.textparser import (
 )
 
 
-class NullAnalyzer:
+class WhitespaceTokenAnalyzer:
 
     def process(self, input):
         return input
