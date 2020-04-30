@@ -9,7 +9,6 @@ from hashedindex.textparser import (
 
 
 class NullAnalyzer:
-
     def process(self, input):
         return input
 
@@ -53,7 +52,12 @@ def tokenize(doc, stopwords=None, ngrams=None, stemmer=None, analyzer=None):
 
     for ngrams in range(ngrams, 0, -1):
         for term in word_tokenize(
-            doc, stopwords, ngrams, stemmer=stemmer, ignore_numeric=False
+            doc,
+            stopwords,
+            ngrams,
+            stemmer=stemmer,
+            ignore_numeric=False,
+            retain_casing=True,
         ):
             yield term
 
