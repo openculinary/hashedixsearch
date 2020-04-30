@@ -15,6 +15,12 @@ class NullAnalyzer:
 
 class WhitespaceTokenAnalyzer:
 
+    def process(self, input):
+        return input
+
+
+class WhitespaceTokenAnalyzer:
+
     remove_punctuation = str.maketrans("", "", punctuation)
 
     def process(self, input):
