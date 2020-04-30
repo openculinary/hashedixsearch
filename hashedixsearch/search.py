@@ -9,7 +9,6 @@ from hashedindex.textparser import (
 
 
 class NullAnalyzer:
-
     def process(self, input):
         return input
 
