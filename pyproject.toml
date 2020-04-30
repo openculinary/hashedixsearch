@@ -12,7 +12,7 @@ repository = "https://github.com/openculinary/hashedixsearch/"
 version = "0.1.1"
 
 [tool.poetry.dependencies]
-hashedindex = "^0.6.0"
+hashedindex = "^0.7.0"
 python = "^3.7"
 
 [tool.poetry.dev-dependencies]
