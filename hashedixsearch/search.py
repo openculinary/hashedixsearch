@@ -37,14 +37,16 @@ class SynonymAnalyzer(WhitespaceTokenAnalyzer):
             yield token
 
 
-def tokenize(doc, stopwords=None, ngrams=None, stemmer=None, analyzer=None):
+def tokenize(doc, stopwords=None, ngrams=None, stemmer=None, analyzer=None,
+             retain_casing=False, retain_punctuation=False,
+             tokenize_whitespace=False):
     stopwords = stopwords or []
     stemmer = stemmer or NullStemmer()
     analyzer = analyzer or WhitespaceTokenAnalyzer()
 
     words = list(analyzer.process(doc))
     word_count = len(words)
-    doc = " ".join(words)
+    doc = ("" if tokenize_whitespace else " ").join(words)
 
     ngrams = ngrams or word_count
     ngrams = min(ngrams, word_count, 4)
@@ -57,8 +59,9 @@ def tokenize(doc, stopwords=None, ngrams=None, stemmer=None, analyzer=None):
             ngrams,
             stemmer=stemmer,
             ignore_numeric=False,
-            retain_casing=True,
-            retain_punctuation=True
+            retain_casing=retain_casing,
+            retain_punctuation=retain_punctuation,
+            tokenize_whitespace=tokenize_whitespace
         ):
             yield term
 
@@ -134,8 +137,12 @@ def execute_query_exact(index, term):
 
 
 def ngram_to_term(ngram, stemmer, analyzer):
-    text = " ".join(ngram)
-    return next(tokenize(doc=text, stemmer=stemmer, analyzer=analyzer))
+    text = " ".join((token for token in ngram if token.strip()))
+    return next(tokenize(
+        doc=text,
+        stemmer=stemmer,
+        analyzer=analyzer
+    ))
 
 
 def find_best_match(ngram, terms):
@@ -157,8 +164,15 @@ def highlight(query, terms, stemmer, analyzer):
 
     # Generate unstemmed ngrams of the maximum term length
     ngrams = []
-    for tokens in tokenize(doc=query, ngrams=max_n, analyzer=analyzer):
-        if len(tokens) < max_n:
+    for tokens in tokenize(
+        doc=query,
+        ngrams=(2 * max_n) - 1,
+        analyzer=NullAnalyzer(),
+        retain_casing=True,
+        retain_punctuation=True,
+        tokenize_whitespace=True,
+    ):
+        if len(tokens) < (2 * max_n) - 1:
             break
         ngrams.append(tokens)
 
@@ -180,8 +194,6 @@ def highlight(query, terms, stemmer, analyzer):
         # Stop when we reach an empty end-of-stream ngram
         if not ngram:
             break
-        if markup:
-            markup += " "
 
         # Determine whether any of the highlighting terms match
         ngram_term = ngram_to_term(ngram, stemmer, analyzer)
