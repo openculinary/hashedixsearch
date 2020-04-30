@@ -127,7 +127,7 @@ def test_highlighting():
 
     markup = highlight(doc, [term], stemmer, analyzer)
 
-    assert markup == "five <mark>onions</mark> diced"
+    assert markup == "five <mark>onions</mark>, diced"
 
 
 def test_phrase_term_highlighting():
@@ -181,7 +181,7 @@ def test_retain_numbers():
 def test_retained_style():
     doc = "Sentence one, oven.  Phrase two: pan."
     terms = [("oven",), ("pan",)]
-    expected = "Sentence one, <mark>oven</mark>. Phrase two: <mark>pan</mark>."
+    expected = "Sentence one, <mark>oven</mark>.  Phrase two: <mark>pan</mark>."
 
     stemmer = NaivePluralStemmer()
     analyzer = RetainPunctuationAnalyzer()
