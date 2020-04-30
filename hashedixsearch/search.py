@@ -8,6 +8,12 @@ from hashedindex.textparser import (
 )
 
 
+class NullAnalyzer:
+
+    def process(self, input):
+        return input
+
+
 class WhitespaceTokenAnalyzer:
 
     remove_punctuation = str.maketrans("", "", punctuation)
