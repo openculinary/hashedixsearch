@@ -58,6 +58,7 @@ def tokenize(doc, stopwords=None, ngrams=None, stemmer=None, analyzer=None):
             stemmer=stemmer,
             ignore_numeric=False,
             retain_casing=True,
+            retain_punctuation=True
         ):
             yield term
 
