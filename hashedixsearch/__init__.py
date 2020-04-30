@@ -6,6 +6,7 @@ from hashedixsearch.search import (  # noqa
     execute_query_exact,
     highlight,
     tokenize,
+    NullAnalyzer,
     NullStemmer,
     SynonymAnalyzer,
     WhitespaceTokenAnalyzer,
