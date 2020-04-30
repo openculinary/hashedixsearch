@@ -184,12 +184,27 @@ def highlight(query, terms, stemmer, analyzer):
     # Build up a marked-up representation of the original query
     tag = 0
     markup = ""
+    prev_token = None
     for ngram in ngrams:
 
+        word_token = ngram and ngram[0].strip()
+
         # Advance through the text closing tags after their words are consumed
-        tag -= 1
-        if tag == 0:
-            markup += "</mark>"
+        if word_token:
+            tag -= 1
+            if tag == 0:
+                if prev_token and prev_token.strip():
+                    markup += prev_token
+                    prev_token = None
+                markup += "</mark>"
+
+        if prev_token:
+            markup += prev_token
+            prev_token = None
+
+        # Determine whether we are currently processing a whitespace token
+        if ngram and not ngram[0].strip():
+            whitespace = ngram[0]
 
         # Stop when we reach an empty end-of-stream ngram
         if not ngram:
@@ -200,9 +215,16 @@ def highlight(query, terms, stemmer, analyzer):
         term, n = find_best_match(ngram_term, terms)
 
         # Begin markup if a match was found, and consume the next word token
-        if term:
+        if ngram and ngram[0].strip() and term:
             markup += f"<mark>"
             tag = n
-        markup += f"{ngram[0]}"
+
+        prev_token = f"{ngram[0]}"
+
+    if prev_token:
+        markup += prev_token
+
+    if tag > 0:
+        markup += '</mark>'
 
     return markup
