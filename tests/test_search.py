@@ -179,9 +179,9 @@ def test_retain_numbers():
 
 
 def test_retained_style():
-    doc = "Sentence one, oven.  Phrase two: pan."
+    doc = "Step one, oven.  Phase two: pan."
     terms = [("oven",), ("pan",)]
-    expected = "Sentence one, <mark>oven</mark>.  Phrase two: <mark>pan</mark>."
+    expected = "Step one, <mark>oven</mark>.  Phase two: <mark>pan</mark>."
 
     stemmer = NaivePluralStemmer()
     analyzer = RetainPunctuationAnalyzer()

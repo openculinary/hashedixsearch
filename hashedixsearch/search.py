@@ -37,9 +37,16 @@ class SynonymAnalyzer(WhitespaceTokenAnalyzer):
             yield token
 
 
-def tokenize(doc, stopwords=None, ngrams=None, stemmer=None, analyzer=None,
-             retain_casing=False, retain_punctuation=False,
-             tokenize_whitespace=False):
+def tokenize(
+    doc,
+    stopwords=None,
+    ngrams=None,
+    stemmer=None,
+    analyzer=None,
+    retain_casing=False,
+    retain_punctuation=False,
+    tokenize_whitespace=False,
+):
     stopwords = stopwords or []
     stemmer = stemmer or NullStemmer()
     analyzer = analyzer or WhitespaceTokenAnalyzer()
@@ -61,7 +68,7 @@ def tokenize(doc, stopwords=None, ngrams=None, stemmer=None, analyzer=None,
             ignore_numeric=False,
             retain_casing=retain_casing,
             retain_punctuation=retain_punctuation,
-            tokenize_whitespace=tokenize_whitespace
+            tokenize_whitespace=tokenize_whitespace,
         ):
             yield term
 
@@ -138,11 +145,7 @@ def execute_query_exact(index, term):
 
 def ngram_to_term(ngram, stemmer, analyzer):
     text = " ".join((token for token in ngram if token.strip()))
-    return next(tokenize(
-        doc=text,
-        stemmer=stemmer,
-        analyzer=analyzer
-    ))
+    return next(tokenize(doc=text, stemmer=stemmer, analyzer=analyzer))
 
 
 def find_best_match(ngram, terms):
@@ -202,10 +205,6 @@ def highlight(query, terms, stemmer, analyzer):
             markup += prev_token
             prev_token = None
 
-        # Determine whether we are currently processing a whitespace token
-        if ngram and not ngram[0].strip():
-            whitespace = ngram[0]
-
         # Stop when we reach an empty end-of-stream ngram
         if not ngram:
             break
@@ -225,6 +224,6 @@ def highlight(query, terms, stemmer, analyzer):
         markup += prev_token
 
     if tag > 0:
-        markup += '</mark>'
+        markup += "</mark>"
 
     return markup
