@@ -1,3 +1,5 @@
+from string import punctuation
+
 from hashedixsearch import (
     build_search_index,
     add_to_search_index,
@@ -6,6 +8,7 @@ from hashedixsearch import (
     execute_query_exact,
     highlight,
     tokenize,
+    NullAnalyzer,
     NullStemmer,
     SynonymAnalyzer,
     WhitespaceTokenAnalyzer,
@@ -18,9 +21,19 @@ class NaivePluralStemmer(NullStemmer):
         return word.rstrip("s")
 
 
-class RetainPunctuationAnalyzer(WhitespaceTokenAnalyzer):
-    def analyze_token(self, word):
-        yield word
+class RetainPunctuationAnalyzer(NullAnalyzer):
+    def process(self, input):
+        accumulator = []
+        for character in input:
+            if character in punctuation:
+                if accumulator:
+                    yield "".join(accumulator)
+                yield character
+                accumulator = []
+            else:
+                accumulator.append(character)
+        if accumulator:
+            yield "".join(accumulator)
 
 
 def test_tokenize_stopwords():
