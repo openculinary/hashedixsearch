@@ -50,9 +50,9 @@ def test_token_synonyms():
     synonyms = {"soymilk": "soy milk"}
 
     analyzer = SynonymAnalyzer(synonyms=synonyms)
-    tokens = list(tokenize(doc=doc, analyzer=analyzer))
+    tokens = list(analyzer.process(doc))
 
-    assert tokens == [("soy", "milk"), ("soy",), ("milk",), ()]
+    assert tokens == ["soy", "milk"]
 
 
 def test_document_retrieval():
@@ -68,11 +68,10 @@ def test_document_retrieval():
 def test_analysis_consistency():
     doc = "soymilk"
     synonym = "soy milk"
-    analyzer = SynonymAnalyzer(synonyms={doc: synonym})
 
     index = build_search_index()
-    add_to_search_index(index, 0, "soymilk", analyzer=analyzer)
-    hits = execute_queries(index, ["soy milk"], analyzer=analyzer)
+    add_to_search_index(index, 0, "soymilk", synonyms={doc: synonym})
+    hits = execute_queries(index, ["soy milk"], synonyms={doc: synonym})
 
     assert list(hits)
 
