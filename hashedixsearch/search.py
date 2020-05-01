@@ -141,15 +141,17 @@ def execute_query_exact(index, term):
 
 def ngram_to_term(ngram, stemmer):
     text = "".join(ngram)
-    return next(tokenize(doc=text, stemmer=stemmer, tokenize_whitespace=True))
+    return next(tokenize(
+        doc=text,
+        stemmer=stemmer,
+        retain_casing=True,
+        retain_punctuation=True,
+        tokenize_whitespace=True
+    ))
 
 
 def find_best_match(ngram, terms):
     best = (None, 0)
-    # TODO: remove
-    if not ngram:
-        return best
-
     ngram_length = len(ngram)
     for term, n in terms.items():
 
