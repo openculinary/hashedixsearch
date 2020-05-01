@@ -156,7 +156,7 @@ def find_best_match(ngram, terms):
     for term, n in terms.items():
 
         idx = 0
-        tokens = iter(term)
+        term = iter(term)
         matches = not ngram[idx].isspace()
 
         while matches and idx < min(n, ngram_length):
@@ -164,7 +164,7 @@ def find_best_match(ngram, terms):
                 idx += 1
                 n += 1
                 continue
-            if ngram[idx] == next(tokens):
+            if ngram[idx] == next(term):
                 idx += 1
                 continue
             matches = False
