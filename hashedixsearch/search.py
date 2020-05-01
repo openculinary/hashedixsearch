@@ -37,7 +37,8 @@ class SynonymAnalyzer(WhitespaceTokenAnalyzer):
             yield token
 
 
-def tokenize(doc, stopwords=None, ngrams=None, stemmer=None, tokenize_whitespace=False):
+def tokenize(doc, stopwords=None, ngrams=None, stemmer=None,
+             tokenize_whitespace=False):
     stopwords = stopwords or []
     ngrams = ngrams or 4
     stemmer = stemmer or NullStemmer()
@@ -48,7 +49,7 @@ def tokenize(doc, stopwords=None, ngrams=None, stemmer=None, tokenize_whitespace
             stopwords=stopwords,
             ngrams=ngrams,
             stemmer=stemmer,
-            tokenize_whitespace=tokenize_whitespace
+            tokenize_whitespace=tokenize_whitespace,
         ):
             yield term
 
@@ -61,7 +62,7 @@ def add_to_search_index(
 ):
     if synonyms:
         analyzer = SynonymAnalyzer(synonyms)
-        doc = ' '.join(analyzer.process(doc))
+        doc = " ".join(analyzer.process(doc))
 
     stopwords = stopwords or []
     for term in tokenize(doc=doc, stopwords=stopwords, stemmer=stemmer):
@@ -97,7 +98,7 @@ def execute_query(
 
     if synonyms:
         analyzer = SynonymAnalyzer(synonyms)
-        query = ' '.join(analyzer.process(query))
+        query = " ".join(analyzer.process(query))
 
     query_count = 0
     for term in tokenize(doc=query, stopwords=stopwords, stemmer=stemmer):
@@ -171,7 +172,7 @@ def highlight(query, terms, stemmer):
     # Tail the ngram list with ngrams of decreasing length
     final_ngram = ngrams[-1]
     for n in range(0, max_n):
-        ngrams.append(final_ngram[n + 1 :])
+        ngrams.append(final_ngram[n+1:])
 
     # Build up a marked-up representation of the original query
     tag = 0
