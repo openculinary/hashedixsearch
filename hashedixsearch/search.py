@@ -168,7 +168,7 @@ def find_best_match(ngram, terms):
             matches = False
 
         if matches and n > best[1]:
-            best = term, n
+            best = (term, n)
     return best
 
 
