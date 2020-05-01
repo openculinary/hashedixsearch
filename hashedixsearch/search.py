@@ -146,7 +146,7 @@ def find_best_match(ngram, terms):
     return best
 
 
-def highlight(query, terms, stemmer, analyzer):
+def highlight(query, terms, stemmer):
     terms = {term: len(term) for term in terms}
     max_n = max(n for n in terms.values())
 

@@ -104,9 +104,8 @@ def test_highlighting():
     term = ("onion",)
 
     stemmer = NaivePluralStemmer()
-    analyzer = WhitespaceTokenAnalyzer()
 
-    markup = highlight(doc, [term], stemmer, analyzer)
+    markup = highlight(doc, [term], stemmer)
 
     assert markup == "five <mark>onions</mark> diced"
 
@@ -116,9 +115,8 @@ def test_phrase_term_highlighting():
     term = ("baked", "bean")
 
     stemmer = NaivePluralStemmer()
-    analyzer = WhitespaceTokenAnalyzer()
 
-    markup = highlight(doc, [term], stemmer, analyzer)
+    markup = highlight(doc, [term], stemmer)
 
     assert markup == "can of <mark>baked beans</mark>"
 
@@ -129,9 +127,8 @@ def test_phrase_multi_term_highlighting():
     expected = "put the <mark>skewers</mark> in the <mark>frying pan</mark>"
 
     stemmer = NaivePluralStemmer()
-    analyzer = WhitespaceTokenAnalyzer()
 
-    markup = highlight(doc, terms, stemmer, analyzer)
+    markup = highlight(doc, terms, stemmer)
 
     assert markup == expected
 
@@ -142,8 +139,7 @@ def test_phrase_multi_term_highlighting_extra():
     expected = "put the <mark>kebab skewers</mark> in the <mark>pan</mark>"
 
     stemmer = NaivePluralStemmer()
-    analyzer = WhitespaceTokenAnalyzer()
 
-    markup = highlight(doc, terms, stemmer, analyzer)
+    markup = highlight(doc, terms, stemmer)
 
     assert markup == expected
