@@ -135,12 +135,24 @@ def ngram_to_term(ngram, stemmer):
 
 def find_best_match(ngram, terms):
     best = (None, 0)
+    ngram_length = len(ngram)
     for term, n in terms.items():
-        if len(ngram) < n:
+        if n > ngram_length:
             continue
-        matches = True
-        for idx, subterm in enumerate(term):
-            matches = matches and ngram[idx] == subterm
+
+        idx = 0
+        matches = not ngram[idx].isspace()
+        for token in term:
+            if idx == ngram_length:
+                break
+            if ngram[idx].isspace():
+                idx += 1
+                n += 1
+            if idx == ngram_length:
+                break
+            matches = matches and ngram[idx] == token
+            idx += 1
+
         if matches and n > best[1]:
             best = (term, n)
     return best
