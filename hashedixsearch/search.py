@@ -197,20 +197,12 @@ def highlight(query, terms, stemmer):
     # Build up a marked-up representation of the original query
     tag = 0
     markup = ""
-    prev_token = None
     for ngram in ngrams:
 
         # Advance through the text closing tags after their words are consumed
         tag -= 1
         if tag == 0:
-            if prev_token and prev_token.strip():
-                markup += prev_token
-                prev_token = None
             markup += "</mark>"
-
-        if prev_token:
-            markup += prev_token
-            prev_token = None
 
         # Stop when we reach an empty end-of-stream ngram
         if not ngram:
@@ -221,16 +213,9 @@ def highlight(query, terms, stemmer):
         term, n = find_best_match(ngram_term, terms)
 
         # Begin markup if a match was found, and consume the next word token
-        if ngram and ngram[0].strip() and term:
+        if term:
             markup += f"<mark>"
             tag = n
-
-        prev_token = f"{ngram[0]}"
-
-    if prev_token:
-        markup += prev_token
-
-    if tag > 0:
-        markup += "</mark>"
+        markup += f"{ngram[0]}"
 
     return markup
