@@ -37,21 +37,20 @@ class SynonymAnalyzer(WhitespaceTokenAnalyzer):
             yield token
 
 
-def tokenize(doc, stopwords=None, ngrams=None, stemmer=None, analyzer=None):
+def tokenize(doc, stopwords=None, ngrams=None, stemmer=None,
+             tokenize_whitespace=False):
     stopwords = stopwords or []
+    ngrams = ngrams or 4
     stemmer = stemmer or NullStemmer()
-    analyzer = analyzer or WhitespaceTokenAnalyzer()
-
-    words = list(analyzer.process(doc))
-    word_count = len(words)
-    doc = " ".join(words)
-
-    ngrams = ngrams or word_count
-    ngrams = min(ngrams, word_count, 4)
-    ngrams = max(ngrams, 1)
 
     for ngrams in range(ngrams, 0, -1):
-        for term in word_tokenize(doc, stopwords, ngrams, stemmer=stemmer):
+        for term in word_tokenize(
+            text=doc,
+            stopwords=stopwords,
+            ngrams=ngrams,
+            stemmer=stemmer,
+            tokenize_whitespace=tokenize_whitespace,
+        ):
             yield term
 
     # Produce an end-of-stream marker
@@ -59,12 +58,14 @@ def tokenize(doc, stopwords=None, ngrams=None, stemmer=None, analyzer=None):
 
 
 def add_to_search_index(
-    index, doc_id, doc, stopwords=None, stemmer=None, analyzer=None
+    index, doc_id, doc, stopwords=None, stemmer=None, synonyms=None
 ):
+    if synonyms:
+        analyzer = SynonymAnalyzer(synonyms)
+        doc = " ".join(analyzer.process(doc))
+
     stopwords = stopwords or []
-    for term in tokenize(
-        doc=doc, stopwords=stopwords, stemmer=stemmer, analyzer=analyzer
-    ):
+    for term in tokenize(doc=doc, stopwords=stopwords, stemmer=stemmer):
         if term:
             index.add_term_occurrence(term, doc_id)
 
@@ -74,7 +75,7 @@ def build_search_index():
 
 
 def execute_queries(
-    index, queries, stopwords=None, stemmer=None, analyzer=None, query_limit=1
+    index, queries, stopwords=None, stemmer=None, synonyms=None, query_limit=1
 ):
     for query in queries:
         hits = execute_query(
@@ -82,7 +83,7 @@ def execute_queries(
             query=query,
             stopwords=stopwords,
             stemmer=stemmer,
-            analyzer=analyzer,
+            synonyms=synonyms,
             query_limit=query_limit,
         )
         if hits:
@@ -90,14 +91,17 @@ def execute_queries(
 
 
 def execute_query(
-    index, query, stopwords=None, stemmer=None, analyzer=None, query_limit=1
+    index, query, stopwords=None, stemmer=None, synonyms=None, query_limit=1
 ):
     hits = defaultdict(lambda: 0)
     terms = defaultdict(lambda: [])
+
+    if synonyms:
+        analyzer = SynonymAnalyzer(synonyms)
+        query = " ".join(analyzer.process(query))
+
     query_count = 0
-    for term in tokenize(
-        query, stopwords=stopwords, stemmer=stemmer, analyzer=analyzer
-    ):
+    for term in tokenize(doc=query, stopwords=stopwords, stemmer=stemmer):
         query_count += 1
         try:
             for doc_id in index.get_documents(term):
@@ -125,31 +129,42 @@ def execute_query_exact(index, term):
             return doc_id
 
 
-def ngram_to_term(ngram, stemmer, analyzer):
-    text = " ".join(ngram)
-    return next(tokenize(doc=text, stemmer=stemmer, analyzer=analyzer))
+def ngram_to_term(ngram, stemmer):
+    text = "".join(ngram)
+    return next(tokenize(doc=text, stemmer=stemmer, tokenize_whitespace=True))
 
 
 def find_best_match(ngram, terms):
     best = (None, 0)
+    ngram_length = len(ngram)
     for term, n in terms.items():
-        if len(ngram) < n:
-            continue
-        matches = True
-        for idx, subterm in enumerate(term):
-            matches = matches and ngram[idx] == subterm
+
+        idx = 0
+        term = iter(term)
+        matches = not ngram[idx].isspace()
+
+        while matches and idx < min(n, ngram_length):
+            if ngram[idx].isspace():
+                idx += 1
+                n += 1
+                continue
+            if ngram[idx] == next(term):
+                idx += 1
+                continue
+            matches = False
+
         if matches and n > best[1]:
             best = (term, n)
     return best
 
 
-def highlight(query, terms, stemmer, analyzer):
+def highlight(query, terms, stemmer):
     terms = {term: len(term) for term in terms}
     max_n = max(n for n in terms.values())
 
     # Generate unstemmed ngrams of the maximum term length
     ngrams = []
-    for tokens in tokenize(doc=query, ngrams=max_n, analyzer=analyzer):
+    for tokens in tokenize(doc=query, ngrams=max_n, tokenize_whitespace=True):
         if len(tokens) < max_n:
             break
         ngrams.append(tokens)
@@ -157,7 +172,7 @@ def highlight(query, terms, stemmer, analyzer):
     # Tail the ngram list with ngrams of decreasing length
     final_ngram = ngrams[-1]
     for n in range(0, max_n):
-        ngrams.append(final_ngram[n + 1 :])
+        ngrams.append(final_ngram[n+1:])
 
     # Build up a marked-up representation of the original query
     tag = 0
@@ -172,11 +187,9 @@ def highlight(query, terms, stemmer, analyzer):
         # Stop when we reach an empty end-of-stream ngram
         if not ngram:
             break
-        if markup:
-            markup += " "
 
         # Determine whether any of the highlighting terms match
-        ngram_term = ngram_to_term(ngram, stemmer, analyzer)
+        ngram_term = ngram_to_term(ngram, stemmer)
         term, n = find_best_match(ngram_term, terms)
 
         # Begin markup if a match was found, and consume the next word token

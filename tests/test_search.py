@@ -50,9 +50,9 @@ def test_token_synonyms():
     synonyms = {"soymilk": "soy milk"}
 
     analyzer = SynonymAnalyzer(synonyms=synonyms)
-    tokens = list(tokenize(doc=doc, analyzer=analyzer))
+    tokens = list(analyzer.process(doc))
 
-    assert tokens == [("soy", "milk"), ("soy",), ("milk",), ()]
+    assert tokens == ["soy", "milk"]
 
 
 def test_document_retrieval():
@@ -68,11 +68,10 @@ def test_document_retrieval():
 def test_analysis_consistency():
     doc = "soymilk"
     synonym = "soy milk"
-    analyzer = SynonymAnalyzer(synonyms={doc: synonym})
 
     index = build_search_index()
-    add_to_search_index(index, 0, "soymilk", analyzer=analyzer)
-    hits = execute_queries(index, ["soy milk"], analyzer=analyzer)
+    add_to_search_index(index, 0, "soymilk", synonyms={doc: synonym})
+    hits = execute_queries(index, ["soy milk"], synonyms={doc: synonym})
 
     assert list(hits)
 
@@ -105,9 +104,8 @@ def test_highlighting():
     term = ("onion",)
 
     stemmer = NaivePluralStemmer()
-    analyzer = WhitespaceTokenAnalyzer()
 
-    markup = highlight(doc, [term], stemmer, analyzer)
+    markup = highlight(doc, [term], stemmer)
 
     assert markup == "five <mark>onions</mark> diced"
 
@@ -117,9 +115,8 @@ def test_phrase_term_highlighting():
     term = ("baked", "bean")
 
     stemmer = NaivePluralStemmer()
-    analyzer = WhitespaceTokenAnalyzer()
 
-    markup = highlight(doc, [term], stemmer, analyzer)
+    markup = highlight(doc, [term], stemmer)
 
     assert markup == "can of <mark>baked beans</mark>"
 
@@ -130,9 +127,8 @@ def test_phrase_multi_term_highlighting():
     expected = "put the <mark>skewers</mark> in the <mark>frying pan</mark>"
 
     stemmer = NaivePluralStemmer()
-    analyzer = WhitespaceTokenAnalyzer()
 
-    markup = highlight(doc, terms, stemmer, analyzer)
+    markup = highlight(doc, terms, stemmer)
 
     assert markup == expected
 
@@ -143,8 +139,7 @@ def test_phrase_multi_term_highlighting_extra():
     expected = "put the <mark>kebab skewers</mark> in the <mark>pan</mark>"
 
     stemmer = NaivePluralStemmer()
-    analyzer = WhitespaceTokenAnalyzer()
 
-    markup = highlight(doc, terms, stemmer, analyzer)
+    markup = highlight(doc, terms, stemmer)
 
     assert markup == expected
