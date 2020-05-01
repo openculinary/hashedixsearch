@@ -52,9 +52,9 @@ def tokenize(
 
     for ngrams in range(ngrams, 0, -1):
         for term in word_tokenize(
-            doc,
-            stopwords,
-            ngrams,
+            text=doc,
+            stopwords=stopwords,
+            ngrams=ngrams,
             stemmer=stemmer,
             ignore_numeric=False,
             retain_casing=retain_casing,
