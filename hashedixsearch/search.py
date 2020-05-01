@@ -134,8 +134,8 @@ def ngram_to_term(ngram, stemmer):
     return next(tokenize(doc=text, stemmer=stemmer, tokenize_whitespace=True))
 
 
-def find_best_match(ngram, terms):
-    best = (None, 0)
+def longest_prefix(ngram, terms):
+    prefix_length = 0
     ngram_length = len(ngram)
     for term, n in terms.items():
 
@@ -153,9 +153,9 @@ def find_best_match(ngram, terms):
                 continue
             matches = False
 
-        if matches and n > best[1]:
-            best = (term, n)
-    return best
+        if matches and n > prefix_length:
+            prefix_length = n
+    return prefix_length
 
 
 def highlight(query, terms, stemmer):
@@ -190,12 +190,14 @@ def highlight(query, terms, stemmer):
 
         # Determine whether any of the highlighting terms match
         ngram_term = ngram_to_term(ngram, stemmer)
-        term, n = find_best_match(ngram_term, terms)
+        prefix_length = longest_prefix(ngram_term, terms)
 
-        # Begin markup if a match was found, and consume the next word token
-        if term:
+        # Begin markup if a prefix match was found
+        if prefix_length:
             markup += f"<mark>"
-            tag = n
+            tag = prefix_length
+
+        # Consume one token at a time
         markup += f"{ngram[0]}"
 
     return markup
