@@ -107,7 +107,7 @@ def test_highlighting():
 
     markup = highlight(doc, [term], stemmer)
 
-    assert markup == "five <mark>onions</mark> diced"
+    assert markup == "five <mark>onions</mark>, diced"
 
 
 def test_phrase_term_highlighting():
@@ -137,6 +137,28 @@ def test_phrase_multi_term_highlighting_extra():
     doc = "put the kebab skewers in the pan"
     terms = [("kebab", "skewer",), ("pan",)]
     expected = "put the <mark>kebab skewers</mark> in the <mark>pan</mark>"
+
+    stemmer = NaivePluralStemmer()
+
+    markup = highlight(doc, terms, stemmer)
+
+    assert markup == expected
+
+
+def test_retain_numbers():
+    doc = "preheat the oven to 300 degrees"
+    terms = [("oven",), ("300",)]
+    expected = "preheat the <mark>oven</mark> to <mark>300</mark> degrees"
+
+    markup = highlight(doc, terms, stemmer=None)
+
+    assert markup == expected
+
+
+def test_retained_style():
+    doc = "Step one, oven.  Phase two: pan."
+    terms = [("oven",), ("pan",)]
+    expected = "Step one, <mark>oven</mark>.  Phase two: <mark>pan</mark>."
 
     stemmer = NaivePluralStemmer()
 

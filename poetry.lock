@@ -94,7 +94,7 @@ description = "InvertedIndex implementation using hash lists (dictionaries)"
 name = "hashedindex"
 optional = false
 python-versions = "*"
-version = "0.6.0"
+version = "0.7.0"
 
 [[package]]
 category = "dev"
@@ -276,7 +276,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "9100af9a5a4a4ad6c8331153748f46c8eb7045fc735e5c126da42f364a670e1b"
+content-hash = "323d766e8528c8a85aa8f4cd2f043387142e8a29d11608da3a91e871be7cea92"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -313,8 +313,8 @@ flake8 = [
     {file = "flake8-3.7.9.tar.gz", hash = "sha256:45681a117ecc81e870cbf1262835ae4af5e7a8b08e40b944a8a6e6b895914cfb"},
 ]
 hashedindex = [
-    {file = "hashedindex-0.6.0-py2.py3-none-any.whl", hash = "sha256:f83f23575338e31e7950bdb67423ba10d58e5c66a9d4144315dbdb58bd2ac445"},
-    {file = "hashedindex-0.6.0.tar.gz", hash = "sha256:15f935eb1826754478df328a749db1202cb0d7b4da484bbe5337fcf574e6ed8f"},
+    {file = "hashedindex-0.7.0-py2.py3-none-any.whl", hash = "sha256:200465597354a7dc8b9754a79d3c957b33e345c17ebfdc3e117d5f0ea09c3d05"},
+    {file = "hashedindex-0.7.0.tar.gz", hash = "sha256:99fced4a421a6c8b972c887e9e786064f0cde5be902931794d0d02953344ac13"},
 ]
 importlib-metadata = [
     {file = "importlib_metadata-1.6.0-py2.py3-none-any.whl", hash = "sha256:2a688cbaa90e0cc587f1df48bdc97a6eadccdcd9c35fb3f976a09e3b5016d90f"},

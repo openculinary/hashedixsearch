@@ -37,8 +37,15 @@ class SynonymAnalyzer(WhitespaceTokenAnalyzer):
             yield token
 
 
-def tokenize(doc, stopwords=None, ngrams=None, stemmer=None,
-             tokenize_whitespace=False):
+def tokenize(
+    doc,
+    stopwords=None,
+    ngrams=None,
+    stemmer=None,
+    retain_casing=False,
+    retain_punctuation=False,
+    tokenize_whitespace=False,
+):
     stopwords = stopwords or []
     ngrams = ngrams or 4
     stemmer = stemmer or NullStemmer()
@@ -49,6 +56,9 @@ def tokenize(doc, stopwords=None, ngrams=None, stemmer=None,
             stopwords=stopwords,
             ngrams=ngrams,
             stemmer=stemmer,
+            ignore_numeric=False,
+            retain_casing=retain_casing,
+            retain_punctuation=retain_punctuation,
             tokenize_whitespace=tokenize_whitespace,
         ):
             yield term
@@ -131,7 +141,13 @@ def execute_query_exact(index, term):
 
 def ngram_to_term(ngram, stemmer):
     text = "".join(ngram)
-    return next(tokenize(doc=text, stemmer=stemmer, tokenize_whitespace=True))
+    return next(tokenize(
+        doc=text,
+        stemmer=stemmer,
+        retain_casing=True,
+        retain_punctuation=True,
+        tokenize_whitespace=True
+    ))
 
 
 def longest_prefix(ngram, terms):
@@ -164,7 +180,13 @@ def highlight(query, terms, stemmer):
 
     # Generate unstemmed ngrams of the maximum term length
     ngrams = []
-    for tokens in tokenize(doc=query, ngrams=max_n, tokenize_whitespace=True):
+    for tokens in tokenize(
+        doc=query,
+        ngrams=max_n,
+        retain_casing=True,
+        retain_punctuation=True,
+        tokenize_whitespace=True,
+    ):
         if len(tokens) < max_n:
             break
         ngrams.append(tokens)
