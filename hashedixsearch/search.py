@@ -137,21 +137,20 @@ def find_best_match(ngram, terms):
     best = (None, 0)
     ngram_length = len(ngram)
     for term, n in terms.items():
-        if n > ngram_length:
-            continue
 
         idx = 0
+        term = iter(term)
         matches = not ngram[idx].isspace()
-        for token in term:
-            if idx == ngram_length:
-                break
+
+        while matches and idx < min(n, ngram_length):
             if ngram[idx].isspace():
                 idx += 1
                 n += 1
-            if idx == ngram_length:
-                break
-            matches = matches and ngram[idx] == token
-            idx += 1
+                continue
+            if ngram[idx] == next(term):
+                idx += 1
+                continue
+            matches = False
 
         if matches and n > best[1]:
             best = (term, n)
