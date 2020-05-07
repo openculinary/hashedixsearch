@@ -1,4 +1,5 @@
 from collections import defaultdict
+import re
 from string import punctuation
 
 from hashedindex import HashedIndex
@@ -31,14 +32,38 @@ class WhitespaceTokenAnalyzer:
         yield token
 
 
-class SynonymAnalyzer(WhitespaceTokenAnalyzer):
+class WhitespacePunctuationTokenAnalyzer:
+
+    delimiters = rf'([ {punctuation}])'
+
+    def process(self, input):
+        for token in re.split(self.delimiters, input):
+            if not token:
+                break
+            for analyzed_token in self.analyze_token(token):
+                yield analyzed_token
+
+    def analyze_token(self, token):
+        yield token
+
+
+class SynonymAnalyzer(WhitespacePunctuationTokenAnalyzer):
     def __init__(self, synonyms):
         self.synonyms = synonyms
 
     def analyze_token(self, token):
-        synonym = self.synonyms.get(token) or token
-        for token in synonym.split(" "):
+        synonym = self.synonyms.get(token)
+        if synonym is None:
             yield token
+            return
+
+        tokens = iter(synonym.split(" "))
+        head = next(tokens)
+        tail = next(tokens, None)
+        yield head
+        if tail:
+            yield " "
+            yield tail
 
 
 def tokenize(
@@ -76,7 +101,7 @@ def add_to_search_index(
 ):
     if synonyms:
         analyzer = SynonymAnalyzer(synonyms)
-        doc = " ".join(analyzer.process(doc))
+        doc = "".join(analyzer.process(doc))
 
     stopwords = stopwords or []
     for term in tokenize(doc=doc, stopwords=stopwords, stemmer=stemmer):
@@ -112,7 +137,7 @@ def execute_query(
 
     if synonyms:
         analyzer = SynonymAnalyzer(synonyms)
-        query = " ".join(analyzer.process(query))
+        query = "".join(analyzer.process(query))
 
     query_count = 0
     for term in tokenize(doc=query, stopwords=stopwords, stemmer=stemmer):
@@ -149,7 +174,7 @@ def highlight(query, terms, stemmer=None, synonyms=None):
 
     if synonyms:
         analyzer = SynonymAnalyzer(synonyms)
-        query = " ".join(analyzer.process(query))
+        query = "".join(analyzer.process(query))
 
     # Generate unstemmed ngrams of the maximum term length
     ngrams = []
