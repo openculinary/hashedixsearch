@@ -52,7 +52,7 @@ class SynonymAnalyzer(WhitespacePunctuationTokenAnalyzer):
 
     def analyze_token(self, token):
         synonym = self.synonyms.get(token) or token
-        for token in re.split(r"(\w+)", synonym):
+        for token in re.split(r"(\s+)", synonym):
             yield token
 
 
