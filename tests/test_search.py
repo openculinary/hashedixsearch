@@ -132,6 +132,18 @@ def test_phrase_term_highlighting():
     assert markup == "can of <mark>baked beans</mark>"
 
 
+def test_synonym_highlighting():
+    doc = "soymilk"
+    term = ("soy", "milk")
+
+    stemmer = NaivePluralStemmer()
+    synonyms = {"soymilk": "soy milk"}
+
+    markup = highlight(doc, [term], stemmer, synonyms)
+
+    assert markup == "<mark>soy milk</mark>"
+
+
 def test_phrase_multi_term_highlighting():
     doc = "put the skewers in the frying pan"
     terms = [("skewer",), ("frying", "pan",)]
