@@ -34,7 +34,7 @@ class WhitespaceTokenAnalyzer:
 
 class WhitespacePunctuationTokenAnalyzer:
 
-    delimiters = rf'([ {punctuation}])'
+    delimiters = rf'([\s+|{punctuation}])'
 
     def process(self, input):
         for token in re.split(self.delimiters, input):
