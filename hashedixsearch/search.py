@@ -174,9 +174,13 @@ def longest_prefix(ngram, terms):
     return prefix_length
 
 
-def highlight(query, terms, stemmer):
+def highlight(query, terms, stemmer, synonyms=None):
     terms = {term: len(term) for term in terms}
     max_n = max(n for n in terms.values())
+
+    if synonyms:
+        analyzer = SynonymAnalyzer(synonyms)
+        query = " ".join(analyzer.process(query))
 
     # Generate unstemmed ngrams of the maximum term length
     ngrams = []
