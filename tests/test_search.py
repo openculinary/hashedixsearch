@@ -110,6 +110,17 @@ def test_highlighting():
     assert markup == "five <mark>onions</mark>, diced"
 
 
+def test_highlighting_term_larger_than_query():
+    doc = "tofu"
+    term = ("pack", "tofu",)
+
+    stemmer = NaivePluralStemmer()
+
+    markup = highlight(doc, [term], stemmer)
+
+    assert markup == "tofu"
+
+
 def test_phrase_term_highlighting():
     doc = "can of baked beans"
     term = ("baked", "bean")
