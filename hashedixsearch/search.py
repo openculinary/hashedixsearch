@@ -13,20 +13,6 @@ from hashedixsearch._internal import (
 )
 
 
-class WhitespaceTokenAnalyzer:
-
-    remove_punctuation = str.maketrans("", "", punctuation)
-
-    def process(self, input):
-        for token in input.split(" "):
-            token = token.translate(self.remove_punctuation)
-            for result in self.analyze_token(token):
-                yield result
-
-    def analyze_token(self, token):
-        yield token
-
-
 class WhitespacePunctuationTokenAnalyzer:
 
     delimiters = rf'([\s+|{punctuation}])'

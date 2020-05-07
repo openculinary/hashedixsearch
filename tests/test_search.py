@@ -8,7 +8,6 @@ from hashedixsearch import (
     tokenize,
     NullStemmer,
     SynonymAnalyzer,
-    WhitespaceTokenAnalyzer,
     WhitespacePunctuationTokenAnalyzer,
 )
 
@@ -35,15 +34,6 @@ def test_token_stemming():
     tokens = list(tokenize(doc=doc, stemmer=NaivePluralStemmer))
 
     assert tokens[0] == ("onion",)
-
-
-def test_whitespace_analyzer_tokenization():
-    doc = "coriander, chopped"
-
-    analyzer = WhitespaceTokenAnalyzer()
-    tokens = list(analyzer.process(doc))
-
-    assert tokens == ["coriander", "chopped"]
 
 
 def test_whitespace_punctuation_analyzer_tokenization():
