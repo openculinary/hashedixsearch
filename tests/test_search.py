@@ -110,6 +110,15 @@ def test_highlighting():
     assert markup == "five <mark>onions</mark>, diced"
 
 
+def test_highlighting_unstemmed():
+    doc = "one carrot"
+    term = ("carrot",)
+
+    markup = highlight(doc, [term])
+
+    assert markup == "one <mark>carrot</mark>"
+
+
 def test_highlighting_term_larger_than_query():
     doc = "tofu"
     term = ("pack", "tofu",)
