@@ -174,7 +174,7 @@ def longest_prefix(ngram, terms):
     return prefix_length
 
 
-def highlight(query, terms, stemmer, synonyms=None):
+def highlight(query, terms, stemmer=None, synonyms=None):
     terms = {term: len(term) for term in terms}
     max_n = max(n for n in terms.values())
 
