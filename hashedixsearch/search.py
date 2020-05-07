@@ -6,6 +6,10 @@ from hashedindex.textparser import (
     word_tokenize,
     NullStemmer,
 )
+from hashedixsearch._internal import (
+    _longest_prefix,
+    _ngram_to_term,
+)
 
 
 class NullAnalyzer:
@@ -139,41 +143,6 @@ def execute_query_exact(index, term):
             return doc_id
 
 
-def ngram_to_term(ngram, stemmer):
-    text = "".join(ngram)
-    return next(tokenize(
-        doc=text,
-        stemmer=stemmer,
-        retain_casing=True,
-        retain_punctuation=True,
-        tokenize_whitespace=True
-    ))
-
-
-def longest_prefix(ngram, terms):
-    prefix_length = 0
-    ngram_length = len(ngram)
-    for term, n in terms.items():
-
-        idx = 0
-        term = iter(term)
-        matches = not ngram[idx].isspace()
-
-        while matches and idx < min(n, ngram_length):
-            if ngram[idx].isspace():
-                idx += 1
-                n += 1
-                continue
-            if ngram[idx] == next(term):
-                idx += 1
-                continue
-            matches = False
-
-        if matches and n > prefix_length:
-            prefix_length = n
-    return prefix_length
-
-
 def highlight(query, terms, stemmer=None, synonyms=None):
     terms = {term: len(term) for term in terms}
     max_n = max(n for n in terms.values())
@@ -219,8 +188,8 @@ def highlight(query, terms, stemmer=None, synonyms=None):
             break
 
         # Determine whether any of the highlighting terms match
-        ngram_term = ngram_to_term(ngram, stemmer)
-        prefix_length = longest_prefix(ngram_term, terms)
+        ngram_term = _ngram_to_term(ngram, stemmer)
+        prefix_length = _longest_prefix(ngram_term, terms)
 
         # Begin markup if a prefix match was found
         if prefix_length:
