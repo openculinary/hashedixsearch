@@ -177,7 +177,7 @@ def highlight(query, terms, stemmer=None, synonyms=None):
     ):
         if len(tokens) < max_n:
             break
-        ngrams.append(list(tokens))
+        ngrams.append(tokens)
 
     # If we did not generate any ngrams, do not attempt highlighting
     if not ngrams:
