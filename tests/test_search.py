@@ -1,4 +1,4 @@
-from hashedixsearch import (
+from hashedixsearch.search import (
     build_search_index,
     add_to_search_index,
     execute_queries,
@@ -7,9 +7,6 @@ from hashedixsearch import (
     highlight,
     tokenize,
     NullStemmer,
-    SynonymAnalyzer,
-    WhitespaceTokenAnalyzer,
-    WhitespacePunctuationTokenAnalyzer,
 )
 
 
@@ -35,34 +32,6 @@ def test_token_stemming():
     tokens = list(tokenize(doc=doc, stemmer=NaivePluralStemmer))
 
     assert tokens[0] == ("onion",)
-
-
-def test_whitespace_analyzer_tokenization():
-    doc = "coriander, chopped"
-
-    analyzer = WhitespaceTokenAnalyzer()
-    tokens = list(analyzer.process(doc))
-
-    assert tokens == ["coriander", "chopped"]
-
-
-def test_whitespace_punctuation_analyzer_tokenization():
-    doc = "coriander, chopped"
-
-    analyzer = WhitespacePunctuationTokenAnalyzer()
-    tokens = list(analyzer.process(doc))
-
-    assert tokens == ["coriander", ",", " ", "chopped"]
-
-
-def test_token_synonyms():
-    doc = "soymilk."
-    synonyms = {"soymilk": "soy milk"}
-
-    analyzer = SynonymAnalyzer(synonyms=synonyms)
-    tokens = list(analyzer.process(doc))
-
-    assert tokens == ["soy", " ", "milk", "."]
 
 
 def test_document_retrieval():
