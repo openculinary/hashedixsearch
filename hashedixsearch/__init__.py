@@ -9,5 +9,6 @@ from hashedixsearch.search import (  # noqa
     NullAnalyzer,
     NullStemmer,
     SynonymAnalyzer,
+    WhitespacePunctuationTokenAnalyzer,
     WhitespaceTokenAnalyzer,
 )

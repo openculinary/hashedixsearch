@@ -9,6 +9,7 @@ from hashedixsearch import (
     NullStemmer,
     SynonymAnalyzer,
     WhitespaceTokenAnalyzer,
+    WhitespacePunctuationTokenAnalyzer,
 )
 
 
@@ -36,7 +37,7 @@ def test_token_stemming():
     assert tokens[0] == ("onion",)
 
 
-def test_null_analyzer_tokenization():
+def test_whitespace_analyzer_tokenization():
     doc = "coriander, chopped"
 
     analyzer = WhitespaceTokenAnalyzer()
@@ -45,14 +46,23 @@ def test_null_analyzer_tokenization():
     assert tokens == ["coriander", "chopped"]
 
 
+def test_whitespace_punctuation_analyzer_tokenization():
+    doc = "coriander, chopped"
+
+    analyzer = WhitespacePunctuationTokenAnalyzer()
+    tokens = list(analyzer.process(doc))
+
+    assert tokens == ["coriander", ",", " ", "chopped"]
+
+
 def test_token_synonyms():
-    doc = "soymilk"
+    doc = "soymilk."
     synonyms = {"soymilk": "soy milk"}
 
     analyzer = SynonymAnalyzer(synonyms=synonyms)
     tokens = list(analyzer.process(doc))
 
-    assert tokens == ["soy", "milk"]
+    assert tokens == ["soy", " ", "milk", "."]
 
 
 def test_document_retrieval():
@@ -142,7 +152,7 @@ def test_phrase_term_highlighting():
 
 
 def test_synonym_highlighting():
-    doc = "soymilk"
+    doc = "soymilk."
     term = ("soy", "milk")
 
     stemmer = NaivePluralStemmer()
@@ -150,7 +160,7 @@ def test_synonym_highlighting():
 
     markup = highlight(doc, [term], stemmer, synonyms)
 
-    assert markup == "<mark>soy milk</mark>"
+    assert markup == "<mark>soy milk</mark>."
 
 
 def test_phrase_multi_term_highlighting():
