@@ -100,7 +100,7 @@ def add_to_search_index(
 ):
     if synonyms:
         analyzer = SynonymAnalyzer(synonyms)
-        doc = "".join(analyzer.process(doc))
+        doc = str().join(analyzer.process(doc))
 
     stopwords = stopwords or []
     for term in tokenize(doc=doc, stopwords=stopwords, stemmer=stemmer):
@@ -136,7 +136,7 @@ def execute_query(
 
     if synonyms:
         analyzer = SynonymAnalyzer(synonyms)
-        query = "".join(analyzer.process(query))
+        query = str().join(analyzer.process(query))
 
     query_count = 0
     for term in tokenize(doc=query, stopwords=stopwords, stemmer=stemmer):
@@ -173,7 +173,7 @@ def highlight(query, terms, stemmer=None, synonyms=None):
 
     if synonyms:
         analyzer = SynonymAnalyzer(synonyms)
-        query = "".join(analyzer.process(query))
+        query = str().join(analyzer.process(query))
 
     # Generate unstemmed ngrams of the maximum term length
     ngrams = []
