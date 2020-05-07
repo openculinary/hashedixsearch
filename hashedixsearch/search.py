@@ -203,8 +203,8 @@ def highlight(query, terms, stemmer=None, synonyms=None):
 
         # Begin markup if a prefix match was found
         if longest_term and longest_term != tag:
-            tag = longest_term
             markup += f"<mark>"
+            tag = longest_term
 
         # Consume one token at a time
         markup += f"{ngram[0]}"
@@ -213,7 +213,7 @@ def highlight(query, terms, stemmer=None, synonyms=None):
         if longest_term:
             longest_term.pop(0)
             if not longest_term:
-                tag = None
                 markup += "</mark>"
+                tag = None
 
     return markup
