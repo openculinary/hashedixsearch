@@ -52,7 +52,7 @@ def test_whitespace_punctuation_analyzer_tokenization():
     analyzer = WhitespacePunctuationTokenAnalyzer()
     tokens = list(analyzer.process(doc))
 
-    assert tokens == ["coriander", ",", "chopped"]
+    assert tokens == ["coriander", ",", " ", "chopped"]
 
 
 def test_token_synonyms():
