@@ -1,3 +1,5 @@
+from string import punctuation
+
 import hashedixsearch.search
 
 
@@ -12,25 +14,42 @@ def _ngram_to_term(ngram, stemmer):
     ))
 
 
+def _is_separator(token):
+    if token is None:
+        return False
+    if token.isspace():
+        return True
+    if token.strip(punctuation) == str():
+        return True
+    return False
+
+
 def _longest_prefix(ngram, terms):
-    prefix_length = 0
-    ngram_length = len(ngram)
-    for term, n in terms.items():
+    longest_term = []
+    for term in terms.values():
 
-        idx = 0
-        term = iter(term)
-        matches = not ngram[idx].isspace()
+        # Open iterators over the ngram and term tokens
+        ngram_tokens = iter(ngram)
+        term_tokens = iter(term)
 
-        while matches and idx < min(n, ngram_length):
-            if ngram[idx].isspace():
-                idx += 1
-                n += 1
-                continue
-            if ngram[idx] == next(term):
-                idx += 1
-                continue
-            matches = False
+        ngram_token = next(ngram_tokens, None)
+        term_token = next(term_tokens, None)
 
-        if matches and n > prefix_length:
-            prefix_length = n
-    return prefix_length
+        # Never consider an ngram that begins with a separator as a match
+        if _is_separator(ngram_token):
+            break
+
+        # Consume from the ngram and term streams in parallel
+        while ngram_token and term_token:
+            if ngram_token == term_token:
+                ngram_token = next(ngram_tokens, None)
+                term_token = next(term_tokens, None)
+            if _is_separator(ngram_token):
+                ngram_token = next(ngram_tokens, None)
+            term_token = next(term_tokens, None)
+
+        # If the ngram stream was fully consumed, record the longest term
+        if ngram_token is None and len(term) > len(longest_term):
+            longest_term = term
+
+    return longest_term

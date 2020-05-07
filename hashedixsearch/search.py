@@ -159,8 +159,8 @@ def execute_query_exact(index, term):
 
 
 def highlight(query, terms, stemmer=None, synonyms=None):
-    terms = {term: len(term) for term in terms}
-    max_n = max(n for n in terms.values())
+    terms = {term: list(term) for term in terms}
+    max_n = max(len(term) for term in terms.values())
 
     if synonyms:
         analyzer = SynonymAnalyzer(synonyms)
@@ -189,14 +189,9 @@ def highlight(query, terms, stemmer=None, synonyms=None):
         ngrams.append(final_ngram[n+1:])
 
     # Build up a marked-up representation of the original query
-    tag = 0
+    tag = None
     markup = ""
     for ngram in ngrams:
-
-        # Advance through the text closing tags after their words are consumed
-        tag -= 1
-        if tag == 0:
-            markup += "</mark>"
 
         # Stop when we reach an empty end-of-stream ngram
         if not ngram:
@@ -204,14 +199,21 @@ def highlight(query, terms, stemmer=None, synonyms=None):
 
         # Determine whether any of the highlighting terms match
         ngram_term = _ngram_to_term(ngram, stemmer)
-        prefix_length = _longest_prefix(ngram_term, terms)
+        longest_term = _longest_prefix(ngram_term, terms)
 
         # Begin markup if a prefix match was found
-        if prefix_length:
+        if longest_term and longest_term != tag:
             markup += f"<mark>"
-            tag = prefix_length
+            tag = longest_term
 
         # Consume one token at a time
         markup += f"{ngram[0]}"
+
+        # Close markup when all of a tag's tokens are consumed
+        if longest_term:
+            longest_term.pop(0)
+            if not longest_term:
+                markup += "</mark>"
+                tag = None
 
     return markup
