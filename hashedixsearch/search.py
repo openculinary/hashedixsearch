@@ -1,6 +1,4 @@
 from collections import defaultdict
-import re
-from string import punctuation
 
 from hashedindex import HashedIndex
 from hashedindex.textparser import (
@@ -10,31 +8,8 @@ from hashedindex.textparser import (
 from hashedixsearch._internal import (
     _longest_prefix,
     _ngram_to_term,
+    SynonymAnalyzer,
 )
-
-
-class WhitespacePunctuationTokenAnalyzer:
-
-    delimiters = rf'([\s+|{punctuation}])'
-
-    def process(self, input):
-        for token in re.split(self.delimiters, input):
-            for analyzed_token in self.analyze_token(token):
-                if analyzed_token:
-                    yield analyzed_token
-
-    def analyze_token(self, token):
-        yield token
-
-
-class SynonymAnalyzer(WhitespacePunctuationTokenAnalyzer):
-    def __init__(self, synonyms):
-        self.synonyms = synonyms
-
-    def analyze_token(self, token):
-        synonym = self.synonyms.get(token) or token
-        for token in re.split(r"(\s+)", synonym):
-            yield token
 
 
 def tokenize(

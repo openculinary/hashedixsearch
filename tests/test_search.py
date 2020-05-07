@@ -7,8 +7,6 @@ from hashedixsearch.search import (
     highlight,
     tokenize,
     NullStemmer,
-    SynonymAnalyzer,
-    WhitespacePunctuationTokenAnalyzer,
 )
 
 
@@ -34,25 +32,6 @@ def test_token_stemming():
     tokens = list(tokenize(doc=doc, stemmer=NaivePluralStemmer))
 
     assert tokens[0] == ("onion",)
-
-
-def test_whitespace_punctuation_analyzer_tokenization():
-    doc = "coriander, chopped"
-
-    analyzer = WhitespacePunctuationTokenAnalyzer()
-    tokens = list(analyzer.process(doc))
-
-    assert tokens == ["coriander", ",", " ", "chopped"]
-
-
-def test_token_synonyms():
-    doc = "soymilk."
-    synonyms = {"soymilk": "soy milk"}
-
-    analyzer = SynonymAnalyzer(synonyms=synonyms)
-    tokens = list(analyzer.process(doc))
-
-    assert tokens == ["soy", " ", "milk", "."]
 
 
 def test_document_retrieval():
