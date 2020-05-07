@@ -151,6 +151,15 @@ def test_phrase_term_highlighting():
     assert markup == "can of <mark>baked beans</mark>"
 
 
+def test_phrase_term_highlighting():
+    doc = "sliced red bell pepper as filling"
+    term = ("red", "bell", "pepper")
+
+    markup = highlight(doc, [term])
+
+    assert markup == "sliced <mark>red bell pepper</mark> as filling"
+
+
 def test_synonym_highlighting():
     doc = "soymilk."
     term = ("soy", "milk")
