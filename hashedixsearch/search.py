@@ -17,6 +17,7 @@ def tokenize(
     stopwords=None,
     ngrams=None,
     stemmer=None,
+    synonyms=None,
     retain_casing=False,
     retain_punctuation=False,
     tokenize_whitespace=False,
@@ -24,6 +25,10 @@ def tokenize(
     stopwords = stopwords or []
     ngrams = ngrams or 4
     stemmer = stemmer or NullStemmer()
+
+    if synonyms:
+        analyzer = SynonymAnalyzer(synonyms)
+        doc = str().join(analyzer.process(doc))
 
     for ngrams in range(ngrams, 0, -1):
         for term in word_tokenize(
@@ -45,12 +50,14 @@ def tokenize(
 def add_to_search_index(
     index, doc_id, doc, stopwords=None, stemmer=None, synonyms=None
 ):
-    if synonyms:
-        analyzer = SynonymAnalyzer(synonyms)
-        doc = str().join(analyzer.process(doc))
 
     stopwords = stopwords or []
-    for term in tokenize(doc=doc, stopwords=stopwords, stemmer=stemmer):
+    for term in tokenize(
+        doc=doc,
+        stopwords=stopwords,
+        stemmer=stemmer,
+        synonyms=synonyms,
+    ):
         if term:
             index.add_term_occurrence(term, doc_id)
 
@@ -81,12 +88,13 @@ def execute_query(
     hits = defaultdict(lambda: 0)
     terms = defaultdict(lambda: [])
 
-    if synonyms:
-        analyzer = SynonymAnalyzer(synonyms)
-        query = str().join(analyzer.process(query))
-
     query_count = 0
-    for term in tokenize(doc=query, stopwords=stopwords, stemmer=stemmer):
+    for term in tokenize(
+        doc=query,
+        stopwords=stopwords,
+        stemmer=stemmer,
+        synonyms=synonyms,
+    ):
         query_count += 1
         try:
             for doc_id in index.get_documents(term):
@@ -118,15 +126,12 @@ def highlight(query, terms, stemmer=None, synonyms=None):
     terms = {term: list(term) for term in terms}
     max_n = max(len(term) for term in terms.values())
 
-    if synonyms:
-        analyzer = SynonymAnalyzer(synonyms)
-        query = str().join(analyzer.process(query))
-
     # Generate unstemmed ngrams of the maximum term length
     ngrams = []
     for tokens in tokenize(
         doc=query,
         ngrams=max_n,
+        synonyms=synonyms,
         retain_casing=True,
         retain_punctuation=True,
         tokenize_whitespace=True,
