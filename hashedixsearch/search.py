@@ -210,9 +210,9 @@ def highlight(query, terms, stemmer=None, synonyms=None):
         markup += f"{ngram[0]}"
 
         # Close markup when all of a tag's tokens are consumed
-        if longest_term:
-            longest_term.pop(0)
-            if not longest_term:
+        if tag and tag[0] == ngram_term[0]:
+            tag.pop(0)
+            if not tag:
                 markup += "</mark>"
                 tag = None
 
