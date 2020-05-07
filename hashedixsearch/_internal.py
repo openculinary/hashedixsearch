@@ -14,23 +14,20 @@ def _ngram_to_term(ngram, stemmer):
 
 def _longest_prefix(ngram, terms):
     prefix_length = 0
-    ngram_length = len(ngram)
     for term, n in terms.items():
-
-        idx = 0
         term = iter(term)
-        matches = not ngram[idx].isspace()
-
-        while matches and idx < min(n, ngram_length):
-            if ngram[idx].isspace():
+        matches = not ngram[0].isspace()
+        for idx, token in enumerate(ngram):
+            if idx == n:
+                break
+            if token.isspace():
                 idx += 1
                 n += 1
                 continue
-            if ngram[idx] == next(term):
+            if token == next(term):
                 idx += 1
                 continue
             matches = False
-
         if matches and n > prefix_length:
             prefix_length = n
     return prefix_length
