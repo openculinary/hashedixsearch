@@ -51,18 +51,9 @@ class SynonymAnalyzer(WhitespacePunctuationTokenAnalyzer):
         self.synonyms = synonyms
 
     def analyze_token(self, token):
-        synonym = self.synonyms.get(token)
-        if synonym is None:
+        synonym = self.synonyms.get(token) or token
+        for token in re.split("( )", synonym):
             yield token
-            return
-
-        tokens = iter(synonym.split(" "))
-        head = next(tokens)
-        tail = next(tokens, None)
-        yield head
-        if tail:
-            yield " "
-            yield tail
 
 
 def tokenize(
