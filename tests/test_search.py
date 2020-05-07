@@ -1,4 +1,4 @@
-from hashedixsearch import (
+from hashedixsearch.search import (
     build_search_index,
     add_to_search_index,
     execute_queries,
