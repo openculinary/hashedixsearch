@@ -38,10 +38,9 @@ class WhitespacePunctuationTokenAnalyzer:
 
     def process(self, input):
         for token in re.split(self.delimiters, input):
-            if not token:
-                break
             for analyzed_token in self.analyze_token(token):
-                yield analyzed_token
+                if analyzed_token:
+                    yield analyzed_token
 
     def analyze_token(self, token):
         yield token
