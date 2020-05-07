@@ -195,6 +195,10 @@ def highlight(query, terms, stemmer, synonyms=None):
             break
         ngrams.append(tokens)
 
+    # If we did not generate any ngrams, do not attempt highlighting
+    if not ngrams:
+        return query
+
     # Tail the ngram list with ngrams of decreasing length
     final_ngram = ngrams[-1]
     for n in range(0, max_n):
