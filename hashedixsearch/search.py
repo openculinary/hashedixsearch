@@ -123,6 +123,11 @@ def execute_query_exact(index, term):
 
 
 def highlight(query, terms, stemmer=None, synonyms=None):
+
+    # If no terms are provided to match on, do not attempt highlighting
+    if not terms:
+        return query
+
     terms = {term: list(term) for term in terms}
     max_n = max(len(term) for term in terms.values())
 
