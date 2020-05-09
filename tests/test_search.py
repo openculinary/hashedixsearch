@@ -98,6 +98,24 @@ def test_highlighting_unstemmed():
     assert markup == "one <mark>carrot</mark>"
 
 
+def test_highlighting_case_insensitive_term():
+    doc = "Wine"
+    term = ("wine",)
+
+    markup = highlight(doc, [term], case_sensitive=False)
+
+    assert markup == "<mark>Wine</mark>"
+
+
+def test_highlighting_case_insensitive_phrase():
+    doc = "Place in Dutch Oven, and leave for one hour"
+    term = ("dutch", "oven")
+
+    markup = highlight(doc, [term], case_sensitive=False)
+
+    assert markup == "Place in <mark>Dutch Oven</mark>, and leave for one hour"
+
+
 def test_highlighting_empty_terms():
     doc = "mushrooms"
 

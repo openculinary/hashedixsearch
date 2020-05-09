@@ -122,7 +122,7 @@ def execute_query_exact(index, term):
             return doc_id
 
 
-def highlight(query, terms, stemmer=None, synonyms=None):
+def highlight(query, terms, stemmer=None, synonyms=None, case_sensitive=True):
 
     # If no terms are provided to match on, do not attempt highlighting
     if not terms:
@@ -164,7 +164,7 @@ def highlight(query, terms, stemmer=None, synonyms=None):
             break
 
         # Determine whether any of the highlighting terms match
-        ngram_term = _ngram_to_term(ngram, stemmer)
+        ngram_term = _ngram_to_term(ngram, stemmer, case_sensitive)
         longest_term = _longest_prefix(ngram_term, terms)
 
         # Begin markup if a prefix match was found
