@@ -125,6 +125,15 @@ def test_highlighting_partial_match_ignored():
     assert markup == "Place in Dutch oven, and leave for one hour"
 
 
+def test_highlighting_repeat_match():
+    doc = "daal daal daal"
+    term = ("daal",)
+
+    markup = highlight(doc, [term])
+
+    assert markup == "<mark>daal</mark> <mark>daal</mark> <mark>daal</mark>"
+
+
 def test_highlighting_empty_terms():
     doc = "mushrooms"
 
