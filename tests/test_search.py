@@ -89,6 +89,17 @@ def test_highlighting():
     assert markup == "five <mark>onions</mark>, diced"
 
 
+def test_highlighting_escaping():
+    doc = "egg & bacon"
+    terms = [("egg",), ("bacon",)]
+
+    stemmer = NaivePluralStemmer()
+
+    markup = highlight(doc, terms, stemmer)
+
+    assert markup == "<mark>egg</mark> &amp; <mark>bacon</mark>"
+
+
 def test_highlighting_unstemmed():
     doc = "one carrot"
     term = ("carrot",)
