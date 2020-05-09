@@ -1,3 +1,4 @@
+from copy import copy
 import re
 from string import punctuation
 
@@ -82,4 +83,5 @@ def _longest_prefix(ngram, terms):
         if ngram_token is None and len(term) > len(longest_term):
             longest_term = term
 
-    return longest_term
+    # Return a mutable copy of the longest term
+    return copy(longest_term)
