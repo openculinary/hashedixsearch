@@ -66,13 +66,17 @@ def _longest_prefix(ngram, terms):
 
         # Consume from the ngram and term streams in parallel
         while ngram_token and term_token:
+            while _is_separator(ngram_token):
+                ngram_token = next(ngram_tokens, None)
             if ngram_token == term_token:
                 ngram_token = next(ngram_tokens, None)
                 term_token = next(term_tokens, None)
-            if _is_separator(ngram_token):
-                ngram_token = next(ngram_tokens, None)
             else:
-                term_token = next(term_tokens, None)
+                break
+
+        # Discard trailing ngram separators
+        while _is_separator(ngram_token):
+            ngram_token = next(ngram_tokens, None)
 
         # If the ngram stream was fully consumed, record the longest term
         if ngram_token is None and len(term) > len(longest_term):
