@@ -116,6 +116,15 @@ def test_highlighting_case_insensitive_phrase():
     assert markup == "Place in <mark>Dutch Oven</mark>, and leave for one hour"
 
 
+def test_highlighting_partial_match_ignored():
+    doc = "Place in Dutch oven, and leave for one hour"
+    term = ("dutch", "oven")
+
+    markup = highlight(doc, [term])
+
+    assert markup == "Place in Dutch oven, and leave for one hour"
+
+
 def test_highlighting_empty_terms():
     doc = "mushrooms"
 
