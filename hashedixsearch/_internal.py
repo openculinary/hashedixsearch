@@ -28,12 +28,12 @@ class SynonymAnalyzer(WhitespacePunctuationTokenAnalyzer):
             yield token
 
 
-def _ngram_to_term(ngram, stemmer):
+def _ngram_to_term(ngram, stemmer, case_sensitive):
     text = "".join(ngram)
     return next(hashedixsearch.search.tokenize(
         doc=text,
         stemmer=stemmer,
-        retain_casing=True,
+        retain_casing=case_sensitive,
         retain_punctuation=True,
         tokenize_whitespace=True
     ))
