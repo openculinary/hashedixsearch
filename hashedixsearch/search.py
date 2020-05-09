@@ -1,4 +1,5 @@
 from collections import defaultdict
+from xml.sax.saxutils import escape
 
 from hashedindex import HashedIndex
 from hashedindex.textparser import (
@@ -169,11 +170,11 @@ def highlight(query, terms, stemmer=None, synonyms=None, case_sensitive=True):
 
         # Begin markup if a prefix match was found
         if longest_term and longest_term != tag:
-            markup += f"<mark>"
+            markup += "<mark>"
             tag = longest_term
 
         # Consume one token at a time
-        markup += f"{ngram[0]}"
+        markup += escape(ngram[0])
 
         # Close markup when all of a tag's tokens are consumed
         if tag and tag[0] == ngram_term[0]:
