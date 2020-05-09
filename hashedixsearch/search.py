@@ -127,7 +127,7 @@ def highlight(query, terms, stemmer=None, synonyms=None, case_sensitive=True):
 
     # If no terms are provided to match on, do not attempt highlighting
     if not terms:
-        return query
+        return escape(query)
 
     terms = {term: list(term) for term in terms}
     max_n = max(len(term) for term in terms.values())
@@ -148,7 +148,7 @@ def highlight(query, terms, stemmer=None, synonyms=None, case_sensitive=True):
 
     # If we did not generate any ngrams, do not attempt highlighting
     if not ngrams:
-        return query
+        return escape(query)
 
     # Tail the ngram list with ngrams of decreasing length
     final_ngram = ngrams[-1]
