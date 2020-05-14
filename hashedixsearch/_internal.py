@@ -60,8 +60,8 @@ def _candidate_matches(ngram, terms):
 
     # Open an iterator over each candidate term's tokens
     candidates = {
-        term: iter(term_list)
-        for term, term_list in terms.items()
+        term: iter(term_tokens)
+        for term, term_tokens in terms.items()
     }
 
     # Continue while candidates remain
