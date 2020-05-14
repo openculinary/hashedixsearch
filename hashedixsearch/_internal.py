@@ -64,17 +64,16 @@ def _candidate_matches(ngram, terms):
         for term, term_tokens in terms.items()
     }
 
-    # Continue while candidates remain
-    while candidates:
+    # Step through the input ngram tokens one at a time
+    while ngram_token := next(ngram_tokens, None):
 
-        # Skip past whitespace in the ngram tokens
-        ngram_token = next(ngram_tokens, None)
+        # Skip past separator tokens
         while _is_separator(ngram_token):
             ngram_token = next(ngram_tokens, None)
         if not ngram_token:
             break
 
-        # Advance the iterator for each candidate term
+        # Narrow the list of candidates to those that continue to match
         candidates = {
             term: term_tokens
             for term, term_tokens in candidates.items()
