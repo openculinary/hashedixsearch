@@ -1,4 +1,3 @@
-from copy import copy
 import re
 from string import punctuation
 
@@ -50,38 +49,40 @@ def _is_separator(token):
     return False
 
 
-def _longest_prefix(ngram, terms):
-    longest_term = []
-    for term in terms.values():
+def _candidate_matches(ngram, terms):
 
-        # Open iterators over the ngram and term tokens
-        ngram_tokens = iter(ngram)
-        term_tokens = iter(term)
+    # Never consider an ngram that begins with a separator as a match
+    if _is_separator(ngram[0]):
+        return
 
-        ngram_token = next(ngram_tokens, None)
-        term_token = next(term_tokens, None)
+    # Open an iterator over the ngram terms
+    ngram_tokens = iter(ngram)
 
-        # Never consider an ngram that begins with a separator as a match
-        if _is_separator(ngram_token):
-            break
+    # Open an iterator over each candidate term's tokens
+    candidates = {
+        term: iter(term_tokens)
+        for term, term_tokens in terms.items()
+    }
 
-        # Consume from the ngram and term streams in parallel
-        while ngram_token and term_token:
-            while _is_separator(ngram_token):
-                ngram_token = next(ngram_tokens, None)
-            if ngram_token == term_token:
-                ngram_token = next(ngram_tokens, None)
-                term_token = next(term_tokens, None)
-            else:
-                break
+    # Step through the input ngram
+    while ngram_token := next(ngram_tokens, None):
 
-        # Discard trailing ngram separators
+        # Skip past separator tokens
         while _is_separator(ngram_token):
             ngram_token = next(ngram_tokens, None)
+        if not ngram_token:
+            break
 
-        # If the ngram stream was fully consumed, record the longest term
-        if ngram_token is None and len(term) > len(longest_term):
-            longest_term = term
+        # Narrow the list of candidates to those that continue to match
+        candidates = {
+            term: term_tokens
+            for term, term_tokens in candidates.items()
+            if next(term_tokens, None) == ngram_token
+        }
 
-    # Return a mutable copy of the longest term
-    return copy(longest_term)
+    # Return the candidate terms along with copies of their token lists
+    return {
+        term: list(term_tokens)
+        for term, term_tokens in terms.items()
+        if term in candidates
+    }

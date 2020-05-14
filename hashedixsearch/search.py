@@ -7,7 +7,8 @@ from hashedindex.textparser import (
     NullStemmer,
 )
 from hashedixsearch._internal import (
-    _longest_prefix,
+    _candidate_matches,
+    _is_separator,
     _ngram_to_term,
     SynonymAnalyzer,
 )
@@ -166,20 +167,25 @@ def highlight(query, terms, stemmer=None, synonyms=None, case_sensitive=True):
 
         # Determine whether any of the highlighting terms match
         ngram_term = _ngram_to_term(ngram, stemmer, case_sensitive)
-        longest_term = _longest_prefix(ngram_term, terms)
 
-        # Begin markup if a prefix match was found
-        if longest_term and longest_term != tag:
-            markup += "<mark>"
-            tag = longest_term
+        if not tag and not _is_separator(ngram_term[0]):
+            tag = _candidate_matches(ngram_term, terms)
+            if tag:
+                markup += "<mark>"
 
         # Consume one token at a time
         markup += escape(ngram[0])
 
-        # Close markup when all of a tag's tokens are consumed
-        if tag and tag[0] == ngram_term[0]:
-            tag.pop(0)
-            if not tag:
+        # Advance the match window of each candidate tag element
+        if tag and not _is_separator(ngram_term[0]):
+            tag = {
+                term: tokens[1:]
+                for term, tokens in tag.items()
+                if tokens[0] == ngram_term[0]
+            }
+
+            # Close the markup when any term's tokens have been consumed
+            if not all(tag.values()):
                 markup += "</mark>"
                 tag = None
 
