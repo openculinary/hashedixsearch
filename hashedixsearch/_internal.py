@@ -64,7 +64,7 @@ def _candidate_matches(ngram, terms):
         for term, term_tokens in terms.items()
     }
 
-    # Step through the input ngram tokens one at a time
+    # Step through the input ngram
     while ngram_token := next(ngram_tokens, None):
 
         # Skip past separator tokens
