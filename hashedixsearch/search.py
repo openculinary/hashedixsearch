@@ -159,6 +159,8 @@ def highlight(query, terms, stemmer=None, synonyms=None, case_sensitive=True):
     # Build up a marked-up representation of the original query
     tag = None
     markup = ""
+    accumulator = ""
+
     for ngram in ngrams:
 
         # Stop when we reach an empty end-of-stream ngram
@@ -170,11 +172,12 @@ def highlight(query, terms, stemmer=None, synonyms=None, case_sensitive=True):
 
         if not tag and not _is_separator(ngram_term[0]):
             tag = _candidate_matches(ngram_term, terms)
-            if tag:
-                markup += "<mark>"
+            markup += accumulator
+            accumulator = ""
 
         # Consume one token at a time
-        markup += escape(ngram[0])
+        accumulator += escape(ngram[0])
+        emit = tag is None
 
         # Advance the match window of each candidate tag element
         if tag and not _is_separator(ngram_term[0]):
@@ -186,7 +189,13 @@ def highlight(query, terms, stemmer=None, synonyms=None, case_sensitive=True):
 
             # Close the markup when any term's tokens have been consumed
             if not all(tag.values()):
-                markup += "</mark>"
+                accumulator = f"<mark>{accumulator}</mark>"
+                emit = True
                 tag = None
 
-    return markup
+        # Output accumulated tokens when we encounter emit-points
+        if emit:
+            markup += accumulator
+            accumulator = ""
+
+    return markup + accumulator
