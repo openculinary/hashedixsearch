@@ -250,3 +250,13 @@ def test_ambiguous_prefix():
     markup = highlight(doc, terms, stemmer)
 
     assert markup == "<mark>food mill</mark>."
+
+
+def test_partial_suffix():
+    doc = "medium onion"
+    terms = [("onion", "gravy")]
+
+    stemmer = NaivePluralStemmer()
+    markup = highlight(doc, terms, stemmer)
+
+    assert markup == "medium onion"
