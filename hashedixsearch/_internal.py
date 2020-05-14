@@ -75,15 +75,11 @@ def _candidate_matches(ngram, terms):
             break
 
         # Advance the iterator for each candidate term
-        for term in terms:
-            term_tokens = candidates.get(term)
-            if not term_tokens:
-                continue
-            term_token = next(term_tokens, None)
-
-            # Remove candidates that no longer match the input
-            if term_token != ngram_token:
-                candidates.pop(term)
+        candidates = {
+            term: term_tokens
+            for term, term_tokens in candidates.items()
+            if next(term_tokens, None) == ngram_token
+        }
 
     # Return the candidates, with copies of the token list
     return {
