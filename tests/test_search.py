@@ -240,3 +240,13 @@ def test_retained_style():
     markup = highlight(doc, terms, stemmer)
 
     assert markup == expected
+
+
+def test_ambiguous_prefix():
+    doc = "food mill."
+    terms = [("food", "processor"), ("food", "mill")]
+
+    stemmer = NaivePluralStemmer()
+    markup = highlight(doc, terms, stemmer)
+
+    assert markup == "<mark>food mill</mark>."
