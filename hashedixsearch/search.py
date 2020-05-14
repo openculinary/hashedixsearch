@@ -176,15 +176,16 @@ def highlight(query, terms, stemmer=None, synonyms=None, case_sensitive=True):
         # Consume one token at a time
         markup += escape(ngram[0])
 
-        # Close markup when all of a tag's tokens are consumed
+        # Advance the match window of each candidate tag element
         if tag and not _is_separator(ngram_term[0]):
             tag = {
                 term: tokens[1:]
                 for term, tokens in tag.items()
                 if tokens[0] == ngram_term[0]
             }
-            finished = any([not tokens for tokens in tag.values()])
-            if finished:
+
+            # Close the markup when any term's tokens have been consumed
+            if not all(tag.values()):
                 markup += "</mark>"
                 tag = None
 
