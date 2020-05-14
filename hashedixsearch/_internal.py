@@ -74,7 +74,7 @@ def _candidate_matches(ngram, terms):
         if not ngram_token:
             break
 
-        # Advance the iterator for each matching term
+        # Advance the iterator for each candidate term
         for term in terms:
             term_tokens = candidates.get(term)
             if not term_tokens:
