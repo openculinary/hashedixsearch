@@ -81,8 +81,9 @@ def _candidate_matches(ngram, terms):
             if next(term_tokens, None) == ngram_token
         }
 
-    # Return the candidates, with copies of the token list
+    # Return the candidate terms along with copies of their token lists
     return {
-        candidate: list(terms[candidate])
-        for candidate in candidates
+        term: list(term_tokens)
+        for term, term_tokens in terms.items()
+        if term in candidates
     }
