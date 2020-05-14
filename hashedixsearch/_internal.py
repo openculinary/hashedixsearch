@@ -1,4 +1,3 @@
-from copy import copy
 import re
 from string import punctuation
 
@@ -50,38 +49,44 @@ def _is_separator(token):
     return False
 
 
-def _longest_prefix(ngram, terms):
-    longest_term = []
-    for term in terms.values():
+def _candidate_matches(ngram, terms):
 
-        # Open iterators over the ngram and term tokens
-        ngram_tokens = iter(ngram)
-        term_tokens = iter(term)
+    # Never consider an ngram that begins with a separator as a match
+    if _is_separator(ngram[0]):
+        return
 
+    # Open an iterator over the ngram terms
+    ngram_tokens = iter(ngram)
+
+    # Open an iterator over each candidate term's tokens
+    candidates = {
+        term: iter(term_list)
+        for term, term_list in terms.items()
+    }
+
+    # Continue while candidates remain
+    while candidates:
+
+        # Skip past whitespace in the ngram tokens
         ngram_token = next(ngram_tokens, None)
-        term_token = next(term_tokens, None)
-
-        # Never consider an ngram that begins with a separator as a match
-        if _is_separator(ngram_token):
-            break
-
-        # Consume from the ngram and term streams in parallel
-        while ngram_token and term_token:
-            while _is_separator(ngram_token):
-                ngram_token = next(ngram_tokens, None)
-            if ngram_token == term_token:
-                ngram_token = next(ngram_tokens, None)
-                term_token = next(term_tokens, None)
-            else:
-                break
-
-        # Discard trailing ngram separators
         while _is_separator(ngram_token):
             ngram_token = next(ngram_tokens, None)
+        if not ngram_token:
+            break
 
-        # If the ngram stream was fully consumed, record the longest term
-        if ngram_token is None and len(term) > len(longest_term):
-            longest_term = term
+        # Advance the iterator for each matching term
+        for term in terms:
+            term_tokens = candidates.get(term)
+            if not term_tokens:
+                continue
+            term_token = next(term_tokens, None)
 
-    # Return a mutable copy of the longest term
-    return copy(longest_term)
+            # Remove candidates that no longer match the input
+            if term_token != ngram_token:
+                candidates.pop(term)
+
+    # Return the candidates, with copies of the token list
+    return {
+        candidate: list(terms[candidate])
+        for candidate in candidates
+    }
