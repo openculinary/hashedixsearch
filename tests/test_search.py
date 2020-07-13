@@ -220,6 +220,15 @@ def test_phrase_multi_term_highlighting_extra():
     assert markup == expected
 
 
+def test_highlighting_non_ascii():
+    doc = "60 ml crème fraîche"
+    term = ("creme", "fraiche")
+
+    markup = highlight(doc, [term])
+
+    assert markup == "60 ml <mark>crème fraîche</mark>"
+
+
 def test_retain_numbers():
     doc = "preheat the oven to 300 degrees"
     terms = [("oven",), ("300",)]
