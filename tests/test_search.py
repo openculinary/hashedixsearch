@@ -1,3 +1,5 @@
+from unidecode import unidecode
+
 from hashedixsearch.search import (
     build_search_index,
     add_to_search_index,
@@ -14,6 +16,13 @@ class NaivePluralStemmer(NullStemmer):
     @staticmethod
     def stem(word):
         return word.rstrip("s")
+
+
+class UnidecodeStemmer(NullStemmer):
+    @staticmethod
+    def stem(word):
+        return unidecode(word)
+
 
 
 def test_tokenize_stopwords():
@@ -224,7 +233,9 @@ def test_highlighting_non_ascii():
     doc = "60 ml crème fraîche"
     term = ("creme", "fraiche")
 
-    markup = highlight(doc, [term])
+    stemmer = UnidecodeStemmer()
+
+    markup = highlight(doc, [term], stemmer)
 
     assert markup == "60 ml <mark>crème fraîche</mark>"
 
