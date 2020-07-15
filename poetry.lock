@@ -89,7 +89,7 @@ description = "InvertedIndex implementation using hash lists (dictionaries)"
 name = "hashedindex"
 optional = false
 python-versions = "*"
-version = "0.8.0"
+version = "0.9.0"
 
 [[package]]
 category = "dev"
@@ -251,6 +251,14 @@ version = "1.4.1"
 
 [[package]]
 category = "dev"
+description = "ASCII transliterations of Unicode text"
+name = "unidecode"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+version = "1.1.1"
+
+[[package]]
+category = "dev"
 description = "Measures number of Terminal column cells of wide-character codes"
 name = "wcwidth"
 optional = false
@@ -271,7 +279,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "40e44befdf651a7c1ed9ede727d135b92ee072257a5bbb443758f813b29b252b"
+content-hash = "eb9ea4082d46631607887c5249937f02ed51c5e4b3dda9ef4f3d37279244671b"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -304,8 +312,8 @@ flake8 = [
     {file = "flake8-3.8.1.tar.gz", hash = "sha256:ea6623797bf9a52f4c9577d780da0bb17d65f870213f7b5bcc9fca82540c31d5"},
 ]
 hashedindex = [
-    {file = "hashedindex-0.8.0-py2.py3-none-any.whl", hash = "sha256:9b61c6e98c7482432a171470e9c54f095aaa0312da6e48e6382493bc3ed36b92"},
-    {file = "hashedindex-0.8.0.tar.gz", hash = "sha256:1dbaa5b5013ed6316ed2c72717d9b1e5cbb69a8bc5ef0d64d6a52ef52e7a902b"},
+    {file = "hashedindex-0.9.0-py2.py3-none-any.whl", hash = "sha256:1b25cf993f525366508acde313a1e327e5a6c68aba6eec4c2743cdf33c038af8"},
+    {file = "hashedindex-0.9.0.tar.gz", hash = "sha256:92eaedc933a64caa962285e2626aedc31ed325e355b03bb65c6e76a8189e2558"},
 ]
 importlib-metadata = [
     {file = "importlib_metadata-1.6.0-py2.py3-none-any.whl", hash = "sha256:2a688cbaa90e0cc587f1df48bdc97a6eadccdcd9c35fb3f976a09e3b5016d90f"},
@@ -405,6 +413,10 @@ typed-ast = [
     {file = "typed_ast-1.4.1-cp38-cp38-win_amd64.whl", hash = "sha256:fc0fea399acb12edbf8a628ba8d2312f583bdbdb3335635db062fa98cf71fca4"},
     {file = "typed_ast-1.4.1-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:d43943ef777f9a1c42bf4e552ba23ac77a6351de620aa9acf64ad54933ad4d34"},
     {file = "typed_ast-1.4.1.tar.gz", hash = "sha256:8c8aaad94455178e3187ab22c8b01a3837f8ee50e09cf31f1ba129eb293ec30b"},
+]
+unidecode = [
+    {file = "Unidecode-1.1.1-py2.py3-none-any.whl", hash = "sha256:1d7a042116536098d05d599ef2b8616759f02985c85b4fef50c78a5aaf10822a"},
+    {file = "Unidecode-1.1.1.tar.gz", hash = "sha256:2b6aab710c2a1647e928e36d69c21e76b453cd455f4e2621000e54b2a9b8cce8"},
 ]
 wcwidth = [
     {file = "wcwidth-0.1.9-py2.py3-none-any.whl", hash = "sha256:cafe2186b3c009a04067022ce1dcd79cb38d8d65ee4f4791b8888d6599d1bbe1"},
