@@ -24,7 +24,6 @@ class UnidecodeStemmer(NullStemmer):
         return unidecode(word)
 
 
-
 def test_tokenize_stopwords():
     doc = "red bell pepper diced"
     stopwords = ["diced"]
