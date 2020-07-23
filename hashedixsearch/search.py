@@ -10,6 +10,7 @@ from hashedixsearch._internal import (
     _candidate_matches,
     _is_separator,
     _ngram_to_term,
+    _render_match,
     SynonymAnalyzer,
 )
 
@@ -124,7 +125,8 @@ def execute_query_exact(index, term):
             return doc_id
 
 
-def highlight(query, terms, stemmer=None, synonyms=None, case_sensitive=True):
+def highlight(query, terms, stemmer=None, synonyms=None, case_sensitive=True,
+              term_attributes=None):
 
     # If no terms are provided to match on, do not attempt highlighting
     if not terms:
@@ -132,6 +134,7 @@ def highlight(query, terms, stemmer=None, synonyms=None, case_sensitive=True):
 
     terms = {term: list(term) for term in terms}
     max_n = max(len(term) for term in terms.values())
+    term_attributes = term_attributes or {}
 
     # Generate unstemmed ngrams of the maximum term length
     ngrams = []
@@ -160,6 +163,7 @@ def highlight(query, terms, stemmer=None, synonyms=None, case_sensitive=True):
     tag = None
     markup = ""
     accumulator = ""
+    attributes = None
 
     for ngram in ngrams:
 
@@ -190,7 +194,8 @@ def highlight(query, terms, stemmer=None, synonyms=None, case_sensitive=True):
             # Close the markup when any term's tokens have been consumed
             closing_term = next(filter(lambda k: not tag[k], tag), None)
             if closing_term:
-                accumulator = f"<mark>{accumulator}</mark>"
+                attributes = term_attributes.get(closing_term)
+                accumulator = _render_match(accumulator, attributes)
                 emit = True
                 tag = None
 
