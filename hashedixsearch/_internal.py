@@ -1,5 +1,6 @@
 import re
 from string import punctuation
+from xml.etree.ElementTree import Element, tostring
 
 import hashedixsearch.search
 
@@ -86,3 +87,9 @@ def _candidate_matches(ngram, terms):
         for term, term_tokens in terms.items()
         if term in candidates
     }
+
+
+def _render_match(text, attributes):
+    element = Element("mark", attributes or {})
+    element.text = text
+    return tostring(element, encoding="unicode")
