@@ -188,7 +188,8 @@ def highlight(query, terms, stemmer=None, synonyms=None, case_sensitive=True):
             }
 
             # Close the markup when any term's tokens have been consumed
-            if not all(tag.values()):
+            closing_term = next(filter(lambda k: not tag[k], tag), None)
+            if closing_term:
                 accumulator = f"<mark>{accumulator}</mark>"
                 emit = True
                 tag = None
