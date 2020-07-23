@@ -163,7 +163,6 @@ def highlight(query, terms, stemmer=None, synonyms=None, case_sensitive=True,
     tag = None
     markup = ""
     accumulator = ""
-    attributes = None
 
     for ngram in ngrams:
 
