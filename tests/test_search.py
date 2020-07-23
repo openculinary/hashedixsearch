@@ -283,12 +283,12 @@ def test_partial_suffix():
 
 def test_term_attributes():
     doc = "garlic"
-    term_garlic = ("garlic",)
+    term = ("garlic",)
 
-    terms = [term_garlic]
-    term_attributes = {term_garlic: {"name": "garlic"}}
+    terms = [term]
+    term_attributes = {term: {"id": "example"}}
 
     stemmer = NaivePluralStemmer()
     markup = highlight(doc, terms, stemmer, term_attributes=term_attributes)
 
-    assert markup == '<mark name="garlic">garlic</mark>'
+    assert markup == '<mark id="example">garlic</mark>'
