@@ -292,3 +292,31 @@ def test_term_attributes():
     markup = highlight(doc, terms, stemmer, term_attributes=term_attributes)
 
     assert markup == '<mark id="example">garlic</mark>'
+
+
+def test_hit_scoring():
+    precise_match = "garlic"
+    imprecise_match = "clove garlic"
+
+    index = build_search_index()
+    add_to_search_index(index, 0, precise_match)
+    add_to_search_index(index, 1, imprecise_match)
+
+    hits = execute_query(index, "garlic")
+
+    assert len(hits) == 2
+    assert hits[0]['doc_id'] == 0
+
+
+def test_term_frequency_tiebreaker():
+    infrequent_doc = "clove"
+    frequent_doc = "garlic"
+
+    index = build_search_index()
+    add_to_search_index(index, 0, infrequent_doc)
+    add_to_search_index(index, 1, frequent_doc, count=5)
+
+    hits = execute_query(index, "garlic clove", query_limit=-1)
+
+    assert len(hits) == 2
+    assert hits[0]['doc_id'] == 1

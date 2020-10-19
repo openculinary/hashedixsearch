@@ -88,6 +88,7 @@ def execute_queries(
 def execute_query(
     index, query, stopwords=None, stemmer=None, synonyms=None, query_limit=1
 ):
+    count = defaultdict(lambda: 0)
     hits = defaultdict(lambda: 0)
     terms = defaultdict(lambda: [])
 
@@ -102,17 +103,24 @@ def execute_query(
         try:
             for doc_id in index.get_documents(term):
                 doc_length = index.get_document_length(doc_id)
-                hits[doc_id] += len(term) / doc_length
+                tf = index.get_term_frequency(term, doc_id)
+                count[doc_id] += tf
+                hits[doc_id] += len(term) * tf / doc_length
                 terms[doc_id].append(term)
         except IndexError:
             pass
         if query_count == query_limit:
             break
     hits = [
-        {"doc_id": doc_id, "score": score, "terms": terms[doc_id]}
+        {
+            "doc_id": doc_id,
+            "score": score,
+            "terms": terms[doc_id],
+            "count": count[doc_id],
+        }
         for doc_id, score in hits.items()
     ]
-    return sorted(hits, key=lambda hit: hit["score"], reverse=True)
+    return sorted(hits, key=lambda x: (x["score"], x["count"]), reverse=True)
 
 
 def execute_query_exact(index, term):
