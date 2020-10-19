@@ -51,7 +51,7 @@ def tokenize(
 
 
 def add_to_search_index(
-    index, doc_id, doc, stopwords=None, stemmer=None, synonyms=None
+    index, doc_id, doc, stopwords=None, stemmer=None, synonyms=None, count=1
 ):
 
     stopwords = stopwords or []
@@ -62,7 +62,7 @@ def add_to_search_index(
         synonyms=synonyms,
     ):
         if term:
-            index.add_term_occurrence(term, doc_id)
+            index.add_term_occurrence(term, doc_id, count=count)
 
 
 def build_search_index():
