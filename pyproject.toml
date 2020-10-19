@@ -9,7 +9,7 @@ description = "in-process search-engine for python"
 license = "AGPL-3.0-or-later"
 name = "hashedixsearch"
 repository = "https://github.com/openculinary/hashedixsearch/"
-version = "0.2.8"
+version = "0.2.9"
 
 [tool.poetry.dependencies]
 hashedindex = "^0.10.0"
