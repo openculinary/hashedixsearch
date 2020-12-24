@@ -34,7 +34,7 @@ def test_token_stemming():
     assert tokens[0] == ("onion",)
 
 
-def test_document_retrieval():
+def test_query():
     doc = "mayonnaise"
 
     index = HashedIXSearch()
@@ -42,6 +42,22 @@ def test_document_retrieval():
     hits = index.query(doc)
 
     assert list(hits)
+
+
+def test_batch_query():
+    docs = ["tomato", "onion"]
+
+    index = HashedIXSearch()
+    for doc in docs:
+        index.add(0, doc)
+
+    results = []
+    for query in docs:
+        hits = index.query(doc)
+        results.append(hits)
+
+    assert len(results) == 2
+    assert all([hits for hits in results])
 
 
 def test_analysis_consistency():
