@@ -150,8 +150,8 @@ class HashedIXSearch(object):
 
         # Tail the ngram list with ngrams of decreasing length
         final_ngram = ngrams[-1]
-        for n in range(0, max_n):
-            ngrams.append(final_ngram[n + 1 :])
+        for n in range(1, max_n + 1):
+            ngrams.append(final_ngram[n:])
 
         # Build up a marked-up representation of the original document
         tag = None
