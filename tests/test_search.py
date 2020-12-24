@@ -1,15 +1,6 @@
 from unidecode import unidecode
 
-from hashedixsearch.search import (
-    build_search_index,
-    add_to_search_index,
-    execute_queries,
-    execute_query,
-    execute_query_exact,
-    highlight,
-    tokenize,
-    NullStemmer,
-)
+from hashedixsearch.search import HashedIXSearch, NullStemmer
 
 
 class NaivePluralStemmer(NullStemmer):
@@ -28,16 +19,17 @@ def test_tokenize_stopwords():
     doc = "red bell pepper diced"
     stopwords = ["diced"]
 
-    tokens = list(tokenize(doc=doc, stopwords=stopwords))
+    index = HashedIXSearch(stopwords=stopwords)
+    tokens = list(index.tokenize(doc=doc))
 
     assert tokens[0] == ("red", "bell", "pepper")
 
 
 def test_token_stemming():
-
     doc = "onions"
 
-    tokens = list(tokenize(doc=doc, stemmer=NaivePluralStemmer))
+    index = HashedIXSearch()
+    tokens = list(index.tokenize(doc=doc, stemmer=NaivePluralStemmer))
 
     assert tokens[0] == ("onion",)
 
@@ -45,9 +37,9 @@ def test_token_stemming():
 def test_document_retrieval():
     doc = "mayonnaise"
 
-    index = build_search_index()
-    add_to_search_index(index, 0, doc)
-    hits = execute_query(index, doc)
+    index = HashedIXSearch()
+    index.add(0, doc)
+    hits = index.query(doc)
 
     assert list(hits)
 
@@ -56,9 +48,9 @@ def test_analysis_consistency():
     doc = "soymilk"
     synonym = "soy milk"
 
-    index = build_search_index()
-    add_to_search_index(index, 0, "soymilk", synonyms={doc: synonym})
-    hits = execute_queries(index, ["soy milk"], synonyms={doc: synonym})
+    index = HashedIXSearch()
+    index.add(0, "soymilk", synonyms={doc: synonym})
+    hits = index.query("soy milk", synonyms={doc: synonym})
 
     assert list(hits)
 
@@ -66,24 +58,24 @@ def test_analysis_consistency():
 def test_exact_match():
     doc = "whole onion"
     stopwords = ["whole"]
-
-    index = build_search_index()
-    add_to_search_index(index, 0, doc, stopwords)
-
     term = ("onion",)
-    assert execute_query_exact(index, term) == 0
+
+    index = HashedIXSearch(stopwords=stopwords)
+    index.add(0, doc)
+
+    assert index.query_exact(term) == 0
 
 
 def test_exact_match_duplicate():
     doc = "whole onion"
     stopwords = ["whole"]
-
-    index = build_search_index()
-    add_to_search_index(index, 0, doc, stopwords)
-    add_to_search_index(index, 0, doc, stopwords)
-
     term = ("onion",)
-    assert execute_query_exact(index, term) == 0
+
+    index = HashedIXSearch()
+    index.add(0, doc, stopwords=stopwords)
+    index.add(0, doc, stopwords=stopwords)
+
+    assert index.query_exact(term) == 0
 
 
 def test_highlighting():
@@ -91,8 +83,8 @@ def test_highlighting():
     term = ("onion",)
 
     stemmer = NaivePluralStemmer()
-
-    markup = highlight(doc, [term], stemmer)
+    index = HashedIXSearch(stemmer=stemmer)
+    markup = index.highlight(doc, [term])
 
     assert markup == "five <mark>onions</mark>, diced"
 
@@ -102,8 +94,8 @@ def test_highlighting_escaping():
     terms = [("egg",), ("bacon",)]
 
     stemmer = NaivePluralStemmer()
-
-    markup = highlight(doc, terms, stemmer)
+    index = HashedIXSearch(stemmer=stemmer)
+    markup = index.highlight(doc, terms)
 
     assert markup == "<mark>egg</mark> &amp; <mark>bacon</mark>"
 
@@ -112,7 +104,8 @@ def test_highlighting_unstemmed():
     doc = "one carrot"
     term = ("carrot",)
 
-    markup = highlight(doc, [term])
+    index = HashedIXSearch()
+    markup = index.highlight(doc, [term])
 
     assert markup == "one <mark>carrot</mark>"
 
@@ -121,7 +114,8 @@ def test_highlighting_case_insensitive_term():
     doc = "Wine"
     term = ("wine",)
 
-    markup = highlight(doc, [term], case_sensitive=False)
+    index = HashedIXSearch()
+    markup = index.highlight(doc, [term], case_sensitive=False)
 
     assert markup == "<mark>Wine</mark>"
 
@@ -130,7 +124,8 @@ def test_highlighting_case_insensitive_phrase():
     doc = "Place in Dutch Oven, and leave for one hour"
     term = ("dutch", "oven")
 
-    markup = highlight(doc, [term], case_sensitive=False)
+    index = HashedIXSearch()
+    markup = index.highlight(doc, [term], case_sensitive=False)
 
     assert markup == "Place in <mark>Dutch Oven</mark>, and leave for one hour"
 
@@ -139,7 +134,8 @@ def test_highlighting_partial_match_ignored():
     doc = "Place in Dutch oven, and leave for one hour"
     term = ("dutch", "oven")
 
-    markup = highlight(doc, [term])
+    index = HashedIXSearch()
+    markup = index.highlight(doc, [term])
 
     assert markup == "Place in Dutch oven, and leave for one hour"
 
@@ -148,7 +144,8 @@ def test_highlighting_repeat_match():
     doc = "daal daal daal"
     term = ("daal",)
 
-    markup = highlight(doc, [term])
+    index = HashedIXSearch()
+    markup = index.highlight(doc, [term])
 
     assert markup == "<mark>daal</mark> <mark>daal</mark> <mark>daal</mark>"
 
@@ -156,7 +153,8 @@ def test_highlighting_repeat_match():
 def test_highlighting_empty_terms():
     doc = "mushrooms"
 
-    markup = highlight(doc, [])
+    index = HashedIXSearch()
+    markup = index.highlight(doc, [])
 
     assert markup == doc
 
@@ -166,8 +164,8 @@ def test_highlighting_term_larger_than_query():
     term = ("pack", "tofu",)
 
     stemmer = NaivePluralStemmer()
-
-    markup = highlight(doc, [term], stemmer)
+    index = HashedIXSearch(stemmer=stemmer)
+    markup = index.highlight(doc, [term])
 
     assert markup == "tofu"
 
@@ -177,8 +175,8 @@ def test_phrase_term_highlighting():
     term = ("baked", "bean")
 
     stemmer = NaivePluralStemmer()
-
-    markup = highlight(doc, [term], stemmer)
+    index = HashedIXSearch(stemmer=stemmer)
+    markup = index.highlight(doc, [term])
 
     assert markup == "can of <mark>baked beans</mark>"
 
@@ -187,7 +185,8 @@ def test_trigram_phrase_term_highlighting():
     doc = "sliced red bell pepper as filling"
     term = ("red", "bell", "pepper")
 
-    markup = highlight(doc, [term])
+    index = HashedIXSearch()
+    markup = index.highlight(doc, [term])
 
     assert markup == "sliced <mark>red bell pepper</mark> as filling"
 
@@ -198,8 +197,8 @@ def test_synonym_highlighting():
 
     stemmer = NaivePluralStemmer()
     synonyms = {"soymilk": "soy milk"}
-
-    markup = highlight(doc, [term], stemmer, synonyms)
+    index = HashedIXSearch(stemmer=stemmer, synonyms=synonyms)
+    markup = index.highlight(doc, [term])
 
     assert markup == "<mark>soy milk</mark>."
 
@@ -210,8 +209,8 @@ def test_phrase_multi_term_highlighting():
     expected = "put the <mark>skewers</mark> in the <mark>frying pan</mark>"
 
     stemmer = NaivePluralStemmer()
-
-    markup = highlight(doc, terms, stemmer)
+    index = HashedIXSearch(stemmer=stemmer)
+    markup = index.highlight(doc, terms)
 
     assert markup == expected
 
@@ -222,8 +221,8 @@ def test_phrase_multi_term_highlighting_extra():
     expected = "put the <mark>kebab skewers</mark> in the <mark>pan</mark>"
 
     stemmer = NaivePluralStemmer()
-
-    markup = highlight(doc, terms, stemmer)
+    index = HashedIXSearch(stemmer=stemmer)
+    markup = index.highlight(doc, terms)
 
     assert markup == expected
 
@@ -233,8 +232,8 @@ def test_highlighting_non_ascii():
     term = ("creme", "fraiche")
 
     stemmer = UnidecodeStemmer()
-
-    markup = highlight(doc, [term], stemmer)
+    index = HashedIXSearch(stemmer=stemmer)
+    markup = index.highlight(doc, [term])
 
     assert markup == "60 ml <mark>crème fraîche</mark>"
 
@@ -244,7 +243,8 @@ def test_retain_numbers():
     terms = [("oven",), ("300",)]
     expected = "preheat the <mark>oven</mark> to <mark>300</mark> degrees"
 
-    markup = highlight(doc, terms, stemmer=None)
+    index = HashedIXSearch()
+    markup = index.highlight(doc, terms)
 
     assert markup == expected
 
@@ -255,8 +255,8 @@ def test_retained_style():
     expected = "Step one, <mark>oven</mark>.  Phase two: <mark>pan</mark>."
 
     stemmer = NaivePluralStemmer()
-
-    markup = highlight(doc, terms, stemmer)
+    index = HashedIXSearch(stemmer=stemmer)
+    markup = index.highlight(doc, terms)
 
     assert markup == expected
 
@@ -266,7 +266,8 @@ def test_ambiguous_prefix():
     terms = [("food", "processor"), ("food", "mill")]
 
     stemmer = NaivePluralStemmer()
-    markup = highlight(doc, terms, stemmer)
+    index = HashedIXSearch(stemmer=stemmer)
+    markup = index.highlight(doc, terms)
 
     assert markup == "<mark>food mill</mark>."
 
@@ -276,7 +277,8 @@ def test_partial_suffix():
     terms = [("onion", "gravy")]
 
     stemmer = NaivePluralStemmer()
-    markup = highlight(doc, terms, stemmer)
+    index = HashedIXSearch(stemmer=stemmer)
+    markup = index.highlight(doc, terms)
 
     assert markup == "medium onion"
 
@@ -289,7 +291,8 @@ def test_term_attributes():
     term_attributes = {term: {"id": "example"}}
 
     stemmer = NaivePluralStemmer()
-    markup = highlight(doc, terms, stemmer, term_attributes=term_attributes)
+    index = HashedIXSearch(stemmer=stemmer)
+    markup = index.highlight(doc, terms, term_attributes=term_attributes)
 
     assert markup == '<mark id="example">garlic</mark>'
 
@@ -298,11 +301,11 @@ def test_hit_scoring():
     precise_match = "garlic"
     imprecise_match = "clove garlic"
 
-    index = build_search_index()
-    add_to_search_index(index, 0, precise_match)
-    add_to_search_index(index, 1, imprecise_match)
+    index = HashedIXSearch()
+    index.add(0, precise_match)
+    index.add(1, imprecise_match)
 
-    hits = execute_query(index, "garlic")
+    hits = index.query("garlic")
 
     assert len(hits) == 2
     assert hits[0]['doc_id'] == 0
@@ -312,11 +315,11 @@ def test_term_frequency_tiebreaker():
     infrequent_doc = "clove"
     frequent_doc = "garlic"
 
-    index = build_search_index()
-    add_to_search_index(index, 0, infrequent_doc)
-    add_to_search_index(index, 1, frequent_doc, count=5)
+    index = HashedIXSearch()
+    index.add(0, infrequent_doc)
+    index.add(1, frequent_doc, count=5)
 
-    hits = execute_query(index, "garlic clove", query_limit=-1)
+    hits = index.query("garlic clove", query_limit=-1)
 
     assert len(hits) == 2
     assert hits[0]['doc_id'] == 1

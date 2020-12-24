@@ -2,8 +2,6 @@ import re
 from string import punctuation
 from xml.etree.ElementTree import Element, tostring
 
-import hashedixsearch.search
-
 
 class WhitespacePunctuationTokenAnalyzer:
 
@@ -27,17 +25,6 @@ class SynonymAnalyzer(WhitespacePunctuationTokenAnalyzer):
         synonym = self.synonyms.get(token) or token
         for token in re.split(r"(\s+)", synonym):
             yield token
-
-
-def _ngram_to_term(ngram, stemmer, case_sensitive):
-    text = "".join(ngram)
-    return next(hashedixsearch.search.tokenize(
-        doc=text,
-        stemmer=stemmer,
-        retain_casing=case_sensitive,
-        retain_punctuation=True,
-        tokenize_whitespace=True
-    ))
 
 
 def _is_separator(token):

@@ -9,206 +9,199 @@ from hashedindex.textparser import (
 from hashedixsearch._internal import (
     _candidate_matches,
     _is_separator,
-    _ngram_to_term,
     _render_match,
     SynonymAnalyzer,
 )
 
 
-def tokenize(
-    doc,
-    stopwords=None,
-    ngrams=None,
-    stemmer=None,
-    synonyms=None,
-    retain_casing=False,
-    retain_punctuation=False,
-    tokenize_whitespace=False,
-):
-    stopwords = stopwords or []
-    ngrams = ngrams or 4
-    stemmer = stemmer or NullStemmer()
-
-    if synonyms:
-        analyzer = SynonymAnalyzer(synonyms)
-        doc = str().join(analyzer.process(doc))
-
-    for ngrams in range(ngrams, 0, -1):
-        for term in word_tokenize(
-            text=doc,
-            stopwords=stopwords,
-            ngrams=ngrams,
-            stemmer=stemmer,
-            ignore_numeric=False,
-            retain_casing=retain_casing,
-            retain_punctuation=retain_punctuation,
-            tokenize_whitespace=tokenize_whitespace,
-        ):
-            yield term
-
-    # Produce an end-of-stream marker
-    yield tuple()
-
-
-def add_to_search_index(
-    index, doc_id, doc, stopwords=None, stemmer=None, synonyms=None, count=1
-):
-
-    stopwords = stopwords or []
-    for term in tokenize(
-        doc=doc,
-        stopwords=stopwords,
-        stemmer=stemmer,
-        synonyms=synonyms,
+class HashedIXSearch(object):
+    def __init__(
+        self,
+        ngrams=4,
+        stemmer=None,
+        stopwords=None,
+        synonyms=None,
+        retain_casing=False,
+        retain_punctuation=False,
+        tokenize_whitespace=False,
     ):
-        if term:
-            index.add_term_occurrence(term, doc_id, count=count)
+        self.index = HashedIndex()
+        self.ngrams = ngrams
+        self.stemmer = stemmer
+        self.stopwords = stopwords
+        self.synonyms = synonyms
+        self.retain_casing = retain_casing
+        self.retain_punctuation = retain_punctuation
+        self.tokenize_whitespace = tokenize_whitespace
 
-
-def build_search_index():
-    return HashedIndex()
-
-
-def execute_queries(
-    index, queries, stopwords=None, stemmer=None, synonyms=None, query_limit=1
-):
-    for query in queries:
-        hits = execute_query(
-            index=index,
-            query=query,
-            stopwords=stopwords,
-            stemmer=stemmer,
-            synonyms=synonyms,
-            query_limit=query_limit,
+    def tokenize(self, doc, **kwargs):
+        ngrams = kwargs.get("ngrams", self.ngrams)
+        stemmer = kwargs.get("stemmer", self.stemmer)
+        stopwords = kwargs.get("stopwords", self.stopwords)
+        synonyms = kwargs.get("synonyms", self.synonyms)
+        retain_casing = kwargs.get("retain_casing", self.retain_casing)
+        retain_punctuation = kwargs.get("retain_punctuation", self.retain_punctuation)
+        tokenize_whitespace = kwargs.get(
+            "tokenize_whitespace", self.tokenize_whitespace
         )
-        if hits:
-            yield query, hits
 
+        if synonyms:
+            analyzer = SynonymAnalyzer(synonyms)
+            doc = str().join(analyzer.process(doc))
 
-def execute_query(
-    index, query, stopwords=None, stemmer=None, synonyms=None, query_limit=1
-):
-    count = defaultdict(lambda: 0)
-    hits = defaultdict(lambda: 0)
-    terms = defaultdict(lambda: [])
+        for ngrams in range(ngrams, 0, -1):
+            for term in word_tokenize(
+                text=doc,
+                ngrams=ngrams,
+                stemmer=stemmer,
+                stopwords=stopwords or [],
+                ignore_numeric=False,
+                retain_casing=retain_casing,
+                retain_punctuation=retain_punctuation,
+                tokenize_whitespace=tokenize_whitespace,
+            ):
+                yield term
 
-    query_count = 0
-    for term in tokenize(
-        doc=query,
-        stopwords=stopwords,
-        stemmer=stemmer,
-        synonyms=synonyms,
-    ):
-        query_count += 1
-        try:
-            for doc_id in index.get_documents(term):
-                doc_length = index.get_document_length(doc_id)
-                tf = index.get_term_frequency(term, doc_id)
+        # Produce an end-of-stream marker
+        yield tuple()
+
+    def add(self, doc_id, doc, **kwargs):
+        count = kwargs.pop("count", 1)
+        for term in self.tokenize(doc=doc, **kwargs):
+            if term:
+                self.index.add_term_occurrence(term, doc_id, count=count)
+
+    def query(self, query, query_limit=1, **kwargs):
+        count = defaultdict(lambda: 0)
+        hits = defaultdict(lambda: 0)
+        terms = defaultdict(lambda: [])
+
+        for query_count, term in enumerate(self.tokenize(doc=query, **kwargs)):
+            if query_count == query_limit:
+                break
+            try:
+                doc_ids = self.index.get_documents(term)
+            except IndexError:
+                continue
+            for doc_id in doc_ids:
+                doc_length = self.index.get_document_length(doc_id)
+                tf = self.index.get_term_frequency(term, doc_id)
                 count[doc_id] += tf
                 hits[doc_id] += len(term) * tf / doc_length
                 terms[doc_id].append(term)
-        except IndexError:
-            pass
-        if query_count == query_limit:
-            break
-    hits = [
-        {
-            "doc_id": doc_id,
-            "score": score,
-            "terms": terms[doc_id],
-            "count": count[doc_id],
-        }
-        for doc_id, score in hits.items()
-    ]
-    return sorted(hits, key=lambda x: (x["score"], x["count"]), reverse=True)
 
-
-def execute_query_exact(index, term):
-    if term not in index:
-        return
-    for doc_id in index.get_documents(term):
-        frequency = index.get_term_frequency(term, doc_id)
-        doc_length = index.get_document_length(doc_id)
-        if frequency == doc_length:
-            return doc_id
-
-
-def highlight(query, terms, stemmer=None, synonyms=None, case_sensitive=True,
-              term_attributes=None):
-
-    # If no terms are provided to match on, do not attempt highlighting
-    if not terms:
-        return escape(query)
-
-    terms = {term: list(term) for term in terms}
-    max_n = max(len(term) for term in terms.values())
-    term_attributes = term_attributes or {}
-
-    # Generate unstemmed ngrams of the maximum term length
-    ngrams = []
-    for tokens in tokenize(
-        doc=query,
-        ngrams=max_n,
-        synonyms=synonyms,
-        retain_casing=True,
-        retain_punctuation=True,
-        tokenize_whitespace=True,
-    ):
-        if len(tokens) < max_n:
-            break
-        ngrams.append(tokens)
-
-    # If we did not generate any ngrams, do not attempt highlighting
-    if not ngrams:
-        return escape(query)
-
-    # Tail the ngram list with ngrams of decreasing length
-    final_ngram = ngrams[-1]
-    for n in range(0, max_n):
-        ngrams.append(final_ngram[n+1:])
-
-    # Build up a marked-up representation of the original query
-    tag = None
-    markup = ""
-    accumulator = ""
-
-    for ngram in ngrams:
-
-        # Stop when we reach an empty end-of-stream ngram
-        if not ngram:
-            break
-
-        # Determine whether any of the highlighting terms match
-        ngram_term = _ngram_to_term(ngram, stemmer, case_sensitive)
-
-        if not tag and not _is_separator(ngram_term[0]):
-            tag = _candidate_matches(ngram_term, terms)
-            markup += accumulator
-            accumulator = ""
-
-        # Consume one token at a time
-        accumulator += escape(ngram[0])
-        emit = tag is None
-
-        # Advance the match window of each candidate tag element
-        if tag and not _is_separator(ngram_term[0]):
-            tag = {
-                term: tokens[1:]
-                for term, tokens in tag.items()
-                if tokens[0] == ngram_term[0]
+        hits = [
+            {
+                "doc_id": doc_id,
+                "score": score,
+                "terms": terms[doc_id],
+                "count": count[doc_id],
             }
+            for doc_id, score in hits.items()
+        ]
+        return sorted(hits, key=lambda x: (x["score"], x["count"]), reverse=True)
 
-            # Close the markup when any term's tokens have been consumed
-            closing_term = next(filter(lambda k: not tag[k], tag), None)
-            if closing_term:
-                attributes = term_attributes.get(closing_term)
-                accumulator = _render_match(accumulator, attributes)
-                emit = True
-                tag = None
+    def query_batch(self, query_batch):
+        for query in query_batch:
+            hits = self.query(query)
+            if hits:
+                yield query, hits
 
-        # Output accumulated tokens when we encounter emit-points
-        if emit:
-            markup += accumulator
-            accumulator = ""
+    def query_exact(self, term):
+        if term not in self.index:
+            return
+        for doc_id in self.index.get_documents(term):
+            frequency = self.index.get_term_frequency(term, doc_id)
+            doc_length = self.index.get_document_length(doc_id)
+            if frequency == doc_length:
+                return doc_id
 
-    return markup + accumulator
+    def _ngram_to_term(self, ngram, case_sensitive):
+        return next(
+            self.tokenize(
+                doc=str().join(ngram),
+                retain_casing=case_sensitive,
+                retain_punctuation=True,
+                tokenize_whitespace=True,
+            )
+        )
+
+    def highlight(self, doc, terms, case_sensitive=True, term_attributes=None):
+        # If no terms are provided to match on, do not attempt highlighting
+        if not terms:
+            return escape(doc)
+
+        terms = {term: list(term) for term in terms}
+        max_n = max(len(term) for term in terms.values())
+        term_attributes = term_attributes or {}
+
+        # Generate unstemmed ngrams of the maximum term length
+        ngrams = []
+        for tokens in self.tokenize(
+            doc=doc,
+            ngrams=max_n,
+            stemmer=NullStemmer(),
+            retain_casing=True,
+            retain_punctuation=True,
+            tokenize_whitespace=True,
+        ):
+            if len(tokens) < max_n:
+                break
+            ngrams.append(tokens)
+
+        # If we did not generate any ngrams, do not attempt highlighting
+        if not ngrams:
+            return escape(doc)
+
+        # Tail the ngram list with ngrams of decreasing length
+        final_ngram = ngrams[-1]
+        for n in range(0, max_n):
+            ngrams.append(final_ngram[n + 1 :])
+
+        # Build up a marked-up representation of the original document
+        tag = None
+        markup = ""
+        accumulator = ""
+
+        for ngram in ngrams:
+
+            # Stop when we reach an empty end-of-stream ngram
+            if not ngram:
+                break
+
+            # Determine whether any of the highlighting terms match
+            ngram_term = self._ngram_to_term(ngram, case_sensitive)
+            print(ngram_term)
+            print(terms)
+
+            if not tag and not _is_separator(ngram_term[0]):
+                tag = _candidate_matches(ngram_term, terms)
+                markup += accumulator
+                accumulator = ""
+
+            # Consume one token at a time
+            accumulator += escape(ngram[0])
+            emit = tag is None
+
+            # Advance the match window of each candidate tag element
+            if tag and not _is_separator(ngram_term[0]):
+                tag = {
+                    term: tokens[1:]
+                    for term, tokens in tag.items()
+                    if tokens[0] == ngram_term[0]
+                }
+
+                # Close the markup when any term's tokens have been consumed
+                closing_term = next(filter(lambda k: not tag[k], tag), None)
+                if closing_term:
+                    attributes = term_attributes.get(closing_term)
+                    accumulator = _render_match(accumulator, attributes)
+                    emit = True
+                    tag = None
+
+            # Output accumulated tokens when we encounter emit-points
+            if emit:
+                markup += accumulator
+                accumulator = ""
+
+        return markup + accumulator
