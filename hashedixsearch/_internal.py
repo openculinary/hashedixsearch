@@ -9,12 +9,11 @@ class WhitespacePunctuationTokenAnalyzer:
 
     def process(self, input):
         for token in re.split(self.delimiters, input):
-            for analyzed_token in self.analyze_token(token):
-                if analyzed_token:
-                    yield analyzed_token
+            yield from self.analyze_token(token)
 
     def analyze_token(self, token):
-        yield token
+        if token:
+            yield token
 
 
 class SynonymAnalyzer(WhitespacePunctuationTokenAnalyzer):
@@ -22,9 +21,9 @@ class SynonymAnalyzer(WhitespacePunctuationTokenAnalyzer):
         self.synonyms = synonyms
 
     def analyze_token(self, token):
-        synonym = self.synonyms.get(token) or token
-        for token in re.split(r"(\s+)", synonym):
-            yield token
+        token = self.synonyms.get(token) or token
+        if token:
+            yield from re.split(r"(\s+)", token)
 
 
 def _is_separator(token):

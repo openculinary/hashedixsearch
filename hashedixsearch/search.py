@@ -50,7 +50,7 @@ class HashedIXSearch(object):
             doc = str().join(analyzer.process(doc))
 
         for ngrams in range(ngrams, 0, -1):
-            for term in word_tokenize(
+            yield from word_tokenize(
                 text=doc,
                 ngrams=ngrams,
                 stemmer=stemmer,
@@ -59,8 +59,7 @@ class HashedIXSearch(object):
                 retain_casing=retain_casing,
                 retain_punctuation=retain_punctuation,
                 tokenize_whitespace=tokenize_whitespace,
-            ):
-                yield term
+            )
 
         # Produce an end-of-stream marker
         yield tuple()
@@ -103,9 +102,7 @@ class HashedIXSearch(object):
 
     def query_batch(self, query_batch):
         for query in query_batch:
-            hits = self.query(query)
-            if hits:
-                yield query, hits
+            yield query, self.query(query)
 
     def query_exact(self, term):
         if term not in self.index:
