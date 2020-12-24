@@ -4,11 +4,13 @@ from xml.sax.saxutils import escape
 from hashedindex import HashedIndex
 from hashedindex.textparser import NullStemmer, word_tokenize
 
-from hashedixsearch._internal import (
+from hashedixsearch.analysis import (
+    SynonymAnalyzer,
+)
+from hashedixsearch._utils import (
     _candidate_matches,
     _is_separator,
     _render_match,
-    SynonymAnalyzer,
 )
 
 

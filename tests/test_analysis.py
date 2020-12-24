@@ -1,4 +1,4 @@
-from hashedixsearch._internal import (
+from hashedixsearch.analysis import (
     SynonymAnalyzer,
     WhitespacePunctuationTokenAnalyzer,
 )
