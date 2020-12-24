@@ -71,9 +71,9 @@ def test_exact_match_duplicate():
     stopwords = ["whole"]
     term = ("onion",)
 
-    index = HashedIXSearch()
-    index.add(0, doc, stopwords=stopwords)
-    index.add(0, doc, stopwords=stopwords)
+    index = HashedIXSearch(stopwords=stopwords)
+    index.add(0, doc)
+    index.add(0, doc)
 
     assert index.query_exact(term) == 0
 
