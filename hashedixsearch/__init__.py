@@ -1,1 +1,1 @@
-from hashedixsearch.search import HashedIXSearch, NullStemmer
+from hashedixsearch.search import HashedIXSearch, NullStemmer  # noqa

@@ -2,10 +2,8 @@ from collections import defaultdict
 from xml.sax.saxutils import escape
 
 from hashedindex import HashedIndex
-from hashedindex.textparser import (
-    word_tokenize,
-    NullStemmer,
-)
+from hashedindex.textparser import NullStemmer, word_tokenize
+
 from hashedixsearch._internal import (
     _candidate_matches,
     _is_separator,
