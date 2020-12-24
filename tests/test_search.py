@@ -48,9 +48,9 @@ def test_analysis_consistency():
     doc = "soymilk"
     synonym = "soy milk"
 
-    index = HashedIXSearch()
-    index.add(0, "soymilk", synonyms={doc: synonym})
-    hits = index.query("soy milk", synonyms={doc: synonym})
+    index = HashedIXSearch(synonyms={doc: synonym})
+    index.add(0, "soymilk")
+    hits = index.query("soy milk")
 
     assert list(hits)
 
