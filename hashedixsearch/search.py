@@ -171,8 +171,6 @@ class HashedIXSearch(object):
 
             # Determine whether any of the highlighting terms match
             ngram_term = self._ngram_to_term(ngram, case_sensitive)
-            print(ngram_term)
-            print(terms)
 
             if not tag and not _is_separator(ngram_term[0]):
                 tag = _candidate_matches(ngram_term, terms)
