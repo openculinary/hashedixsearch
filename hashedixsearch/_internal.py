@@ -5,7 +5,7 @@ from xml.etree.ElementTree import Element, tostring
 
 class WhitespacePunctuationTokenAnalyzer:
 
-    delimiters = rf'([\s+|{punctuation}])'
+    delimiters = rf"([\s+|{punctuation}])"
 
     def process(self, input):
         for token in re.split(self.delimiters, input):
@@ -47,10 +47,7 @@ def _candidate_matches(ngram, terms):
     ngram_tokens = iter(ngram)
 
     # Open an iterator over each candidate term's tokens
-    candidates = {
-        term: iter(term_tokens)
-        for term, term_tokens in terms.items()
-    }
+    candidates = {term: iter(term_tokens) for term, term_tokens in terms.items()}
 
     # Step through the input ngram
     while ngram_token := next(ngram_tokens, None):

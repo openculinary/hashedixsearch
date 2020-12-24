@@ -161,7 +161,10 @@ def test_highlighting_empty_terms():
 
 def test_highlighting_term_larger_than_query():
     doc = "tofu"
-    term = ("pack", "tofu",)
+    term = (
+        "pack",
+        "tofu",
+    )
 
     stemmer = NaivePluralStemmer()
     index = HashedIXSearch(stemmer=stemmer)
@@ -205,7 +208,13 @@ def test_synonym_highlighting():
 
 def test_phrase_multi_term_highlighting():
     doc = "put the skewers in the frying pan"
-    terms = [("skewer",), ("frying", "pan",)]
+    terms = [
+        ("skewer",),
+        (
+            "frying",
+            "pan",
+        ),
+    ]
     expected = "put the <mark>skewers</mark> in the <mark>frying pan</mark>"
 
     stemmer = NaivePluralStemmer()
@@ -217,7 +226,13 @@ def test_phrase_multi_term_highlighting():
 
 def test_phrase_multi_term_highlighting_extra():
     doc = "put the kebab skewers in the pan"
-    terms = [("kebab", "skewer",), ("pan",)]
+    terms = [
+        (
+            "kebab",
+            "skewer",
+        ),
+        ("pan",),
+    ]
     expected = "put the <mark>kebab skewers</mark> in the <mark>pan</mark>"
 
     stemmer = NaivePluralStemmer()
@@ -308,7 +323,7 @@ def test_hit_scoring():
     hits = index.query("garlic")
 
     assert len(hits) == 2
-    assert hits[0]['doc_id'] == 0
+    assert hits[0]["doc_id"] == 0
 
 
 def test_term_frequency_tiebreaker():
@@ -322,4 +337,4 @@ def test_term_frequency_tiebreaker():
     hits = index.query("garlic clove", query_limit=-1)
 
     assert len(hits) == 2
-    assert hits[0]['doc_id'] == 1
+    assert hits[0]["doc_id"] == 1
