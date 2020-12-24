@@ -23,7 +23,7 @@ class HashedIXSearch(object):
         synonyms=None,
         retain_casing=False,
         retain_punctuation=False,
-        tokenize_whitespace=False,
+        retain_whitespace=False,
     ):
         self.index = HashedIndex()
         self.ngrams = ngrams
@@ -32,7 +32,7 @@ class HashedIXSearch(object):
         self.synonyms = synonyms
         self.retain_casing = retain_casing
         self.retain_punctuation = retain_punctuation
-        self.tokenize_whitespace = tokenize_whitespace
+        self.retain_whitespace = retain_whitespace
 
     def tokenize(self, doc, **kwargs):
         ngrams = kwargs.get("ngrams", self.ngrams)
@@ -41,9 +41,7 @@ class HashedIXSearch(object):
         synonyms = kwargs.get("synonyms", self.synonyms)
         retain_casing = kwargs.get("retain_casing", self.retain_casing)
         retain_punctuation = kwargs.get("retain_punctuation", self.retain_punctuation)
-        tokenize_whitespace = kwargs.get(
-            "tokenize_whitespace", self.tokenize_whitespace
-        )
+        retain_whitespace = kwargs.get("retain_whitespace", self.retain_whitespace)
 
         if synonyms:
             analyzer = SynonymAnalyzer(synonyms)
@@ -58,7 +56,7 @@ class HashedIXSearch(object):
                 ignore_numeric=False,
                 retain_casing=retain_casing,
                 retain_punctuation=retain_punctuation,
-                tokenize_whitespace=tokenize_whitespace,
+                tokenize_whitespace=retain_whitespace,
             )
 
         # Produce an end-of-stream marker
@@ -119,7 +117,7 @@ class HashedIXSearch(object):
                 doc=str().join(ngram),
                 retain_casing=case_sensitive,
                 retain_punctuation=True,
-                tokenize_whitespace=True,
+                retain_whitespace=True,
             )
         )
 
@@ -140,7 +138,7 @@ class HashedIXSearch(object):
             stemmer=NullStemmer(),
             retain_casing=True,
             retain_punctuation=True,
-            tokenize_whitespace=True,
+            retain_whitespace=True,
         ):
             if len(tokens) < max_n:
                 break
