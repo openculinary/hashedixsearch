@@ -62,9 +62,9 @@ class HashedIXSearch(object):
 
     def add(self, doc_id, doc, **kwargs):
         count = kwargs.pop("count", 1)
-        for term in self.tokenize(doc=doc, **kwargs):
-            if term:
-                self.index.add_term_occurrence(term, doc_id, count=count)
+        tokens = self.tokenize(doc=doc, **kwargs)
+        while term := next(tokens):
+            self.index.add_term_occurrence(term, doc_id, count=count)
 
     def query(self, query, query_limit=1, **kwargs):
         count = defaultdict(lambda: 0)
