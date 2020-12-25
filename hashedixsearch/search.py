@@ -98,9 +98,9 @@ class HashedIXSearch(object):
             reverse=True,
         )
 
-    def query_batch(self, query_batch):
+    def query_batch(self, query_batch, **kwargs):
         for query in query_batch:
-            yield query, self.query(query)
+            yield query, self.query(query, **kwargs)
 
     def query_exact(self, term):
         if term not in self.index:
