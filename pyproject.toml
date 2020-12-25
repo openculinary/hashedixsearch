@@ -8,6 +8,7 @@ classifiers=[
 description = "in-process search-engine for python"
 license = "AGPL-3.0-or-later"
 name = "hashedixsearch"
+readme = "README.md"
 repository = "https://github.com/openculinary/hashedixsearch/"
 version = "1.0.0"
 
