@@ -7,7 +7,6 @@ from hashedixsearch.analysis import (
 
 
 class TestAnalysis(unittest.TestCase):
-
     def test_whitespace_punctuation_analyzer_tokenization(self):
         doc = "coriander, chopped"
 

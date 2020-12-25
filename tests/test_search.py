@@ -6,7 +6,6 @@ from hashedixsearch.search import HashedIXSearch
 
 
 class TestSearch(unittest.TestCase):
-
     class NaivePluralStemmer(object):
         @staticmethod
         def stem(word):
