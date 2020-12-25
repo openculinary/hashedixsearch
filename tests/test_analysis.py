@@ -1,23 +1,26 @@
+import unittest
+
 from hashedixsearch.analysis import (
     SynonymAnalyzer,
     WhitespacePunctuationTokenAnalyzer,
 )
 
 
-def test_whitespace_punctuation_analyzer_tokenization():
-    doc = "coriander, chopped"
+class TestAnalysis(unittest.TestCase):
 
-    analyzer = WhitespacePunctuationTokenAnalyzer()
-    tokens = list(analyzer.process(doc))
+    def test_whitespace_punctuation_analyzer_tokenization(self):
+        doc = "coriander, chopped"
 
-    assert tokens == ["coriander", ",", " ", "chopped"]
+        analyzer = WhitespacePunctuationTokenAnalyzer()
+        tokens = list(analyzer.process(doc))
 
+        assert tokens == ["coriander", ",", " ", "chopped"]
 
-def test_token_synonyms():
-    doc = "soymilk."
-    synonyms = {"soymilk": "soy milk"}
+    def test_token_synonyms(self):
+        doc = "soymilk."
+        synonyms = {"soymilk": "soy milk"}
 
-    analyzer = SynonymAnalyzer(synonyms=synonyms)
-    tokens = list(analyzer.process(doc))
+        analyzer = SynonymAnalyzer(synonyms=synonyms)
+        tokens = list(analyzer.process(doc))
 
-    assert tokens == ["soy", " ", "milk", "."]
+        assert tokens == ["soy", " ", "milk", "."]
