@@ -1,15 +1,15 @@
 from unidecode import unidecode
 
-from hashedixsearch.search import HashedIXSearch, NullStemmer
+from hashedixsearch.search import HashedIXSearch
 
 
-class NaivePluralStemmer(NullStemmer):
+class NaivePluralStemmer(object):
     @staticmethod
     def stem(word):
         return word.rstrip("s")
 
 
-class UnidecodeStemmer(NullStemmer):
+class UnidecodeStemmer(object):
     @staticmethod
     def stem(word):
         return unidecode(word)
@@ -177,10 +177,7 @@ def test_highlighting_empty_terms():
 
 def test_highlighting_term_larger_than_query():
     doc = "tofu"
-    term = (
-        "pack",
-        "tofu",
-    )
+    term = ("pack", "tofu")
 
     stemmer = NaivePluralStemmer()
     index = HashedIXSearch(stemmer=stemmer)
@@ -226,10 +223,7 @@ def test_phrase_multi_term_highlighting():
     doc = "put the skewers in the frying pan"
     terms = [
         ("skewer",),
-        (
-            "frying",
-            "pan",
-        ),
+        ("frying", "pan"),
     ]
     expected = "put the <mark>skewers</mark> in the <mark>frying pan</mark>"
 
@@ -243,10 +237,7 @@ def test_phrase_multi_term_highlighting():
 def test_phrase_multi_term_highlighting_extra():
     doc = "put the kebab skewers in the pan"
     terms = [
-        (
-            "kebab",
-            "skewer",
-        ),
+        ("kebab", "skewer"),
         ("pan",),
     ]
     expected = "put the <mark>kebab skewers</mark> in the <mark>pan</mark>"

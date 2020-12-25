@@ -18,32 +18,30 @@ def _candidate_matches(ngram, terms):
     if _is_separator(ngram[0]):
         return
 
-    # Open an iterator over the ngram terms
-    ngram_tokens = iter(ngram)
-
     # Open an iterator over each candidate term's tokens
-    candidates = {term: iter(term_tokens) for term, term_tokens in terms.items()}
+    candidates = {term: iter(tokens) for term, tokens in terms.items()}
 
     # Step through the input ngram
-    while ngram_token := next(ngram_tokens, None):
+    tokens = iter(ngram)
+    while token := next(tokens, None):
 
         # Skip past separator tokens
-        while _is_separator(ngram_token):
-            ngram_token = next(ngram_tokens, None)
-        if not ngram_token:
+        while _is_separator(token):
+            token = next(tokens, None)
+        if not token:
             break
 
         # Narrow the list of candidates to those that continue to match
         candidates = {
-            term: term_tokens
-            for term, term_tokens in candidates.items()
-            if next(term_tokens, None) == ngram_token
+            term: remaining_tokens
+            for term, remaining_tokens in candidates.items()
+            if next(remaining_tokens, None) == token
         }
 
     # Return the candidate terms along with copies of their token lists
     return {
-        term: list(term_tokens)
-        for term, term_tokens in terms.items()
+        term: list(remaining_tokens)
+        for term, remaining_tokens in terms.items()
         if term in candidates
     }
 

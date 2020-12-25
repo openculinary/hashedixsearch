@@ -4,9 +4,7 @@ from xml.sax.saxutils import escape
 from hashedindex import HashedIndex
 from hashedindex.textparser import NullStemmer, word_tokenize
 
-from hashedixsearch.analysis import (
-    SynonymAnalyzer,
-)
+from hashedixsearch.analysis import SynonymAnalyzer
 from hashedixsearch._utils import (
     _candidate_matches,
     _is_separator,
@@ -86,17 +84,19 @@ class HashedIXSearch(object):
                 count[doc_id] += tf
                 hits[doc_id] += len(term) * tf / doc_length
                 terms[doc_id].append(term)
-
-        hits = [
-            {
-                "doc_id": doc_id,
-                "score": score,
-                "terms": terms[doc_id],
-                "count": count[doc_id],
-            }
-            for doc_id, score in hits.items()
-        ]
-        return sorted(hits, key=lambda x: (x["score"], x["count"]), reverse=True)
+        return sorted(
+            [
+                {
+                    "doc_id": doc_id,
+                    "score": score,
+                    "terms": terms[doc_id],
+                    "count": count[doc_id],
+                }
+                for doc_id, score in hits.items()
+            ],
+            key=lambda x: (x["score"], x["count"]),
+            reverse=True,
+        )
 
     def query_batch(self, query_batch):
         for query in query_batch:
@@ -158,7 +158,8 @@ class HashedIXSearch(object):
         markup = ""
         accumulator = ""
 
-        for ngram in ngrams:
+        ngrams = iter(ngrams)
+        while ngram := next(ngrams):
 
             # Stop when we reach an empty end-of-stream ngram
             if not ngram:
