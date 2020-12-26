@@ -74,11 +74,9 @@ class HashedIXSearch(object):
         for query_count, term in enumerate(self.tokenize(doc=query, **kwargs)):
             if query_count == query_limit:
                 break
-            try:
-                doc_ids = self.index.get_documents(term)
-            except IndexError:
+            if term not in self.index:
                 continue
-            for doc_id in doc_ids:
+            for doc_id in self.index.get_documents(term):
                 doc_length = self.index.get_document_length(doc_id)
                 tf = self.index.get_term_frequency(term, doc_id)
                 hits[doc_id] += len(term) * tf / doc_length
