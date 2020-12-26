@@ -1,4 +1,5 @@
 from collections import defaultdict
+from io import StringIO
 from xml.sax.saxutils import escape
 
 from hashedindex import HashedIndex
@@ -155,8 +156,8 @@ class HashedIXSearch(object):
 
         # Build up a marked-up representation of the original document
         candidates = None
-        markup = ""
-        accumulator = ""
+        markup = StringIO()
+        accumulator = StringIO()
 
         ngrams = iter(ngrams)
         while ngram := next(ngrams):
@@ -166,11 +167,11 @@ class HashedIXSearch(object):
 
             if not candidates and not _is_separator(ngram_term[0]):
                 candidates = _candidate_matches(ngram_term, terms)
-                markup += accumulator
-                accumulator = ""
+                markup.write(accumulator.getvalue())
+                accumulator = StringIO()
 
             # Consume one token at a time
-            accumulator += escape(ngram[0])
+            accumulator.write(escape(ngram[0]))
 
             # Advance the match window of each candidate element
             if candidates and not _is_separator(ngram_term[0]):
@@ -185,13 +186,14 @@ class HashedIXSearch(object):
                     if remaining_tokens:
                         continue
                     attributes = term_attributes.get(closing_term)
-                    accumulator = _render_match(accumulator, attributes)
+                    accumulator = StringIO(_render_match(accumulator, attributes))
                     candidates = None
                     break
 
             # Output accumulated tokens whenever candidate matching is complete
             if candidates is None:
-                markup += accumulator
-                accumulator = ""
+                markup.write(accumulator.getvalue())
+                accumulator = StringIO()
 
-        return markup + accumulator
+        markup.write(accumulator.getvalue())
+        return markup.getvalue()

@@ -46,7 +46,7 @@ def _candidate_matches(ngram, terms):
     }
 
 
-def _render_match(text, attributes):
+def _render_match(cstring, attributes):
     element = Element("mark", attributes or {})
-    element.text = text
+    element.text = cstring.getvalue()
     return tostring(element, encoding="unicode")
