@@ -14,10 +14,6 @@ def _is_separator(token):
 
 def _candidate_matches(ngram, terms):
 
-    # Never consider an ngram that begins with a separator as a match
-    if _is_separator(ngram[0]):
-        return
-
     # Open an iterator over each candidate term's tokens
     candidates = {term: iter(tokens) for term, tokens in terms.items()}
 
