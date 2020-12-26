@@ -189,6 +189,5 @@ class HashedIXSearch(object):
             if not candidates:
                 markup.write(output)
 
-        if accumulator:
-            markup.write(accumulator.getvalue())
+        markup.write(accumulator.getvalue())
         return markup.getvalue()
