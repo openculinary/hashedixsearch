@@ -175,7 +175,7 @@ class HashedIXSearch(object):
                 accumulator.write(token)
 
             # Advance the match window of each candidate element
-            if candidates and not _is_separator(ngram_term[0]):
+            if not _is_separator(ngram_term[0]):
                 candidates = {
                     term: tokens[1:]
                     for term, tokens in candidates.items()
