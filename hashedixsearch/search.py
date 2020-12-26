@@ -3,7 +3,7 @@ from io import StringIO
 from xml.sax.saxutils import escape
 
 from hashedindex import HashedIndex
-from hashedindex.textparser import NullStemmer, word_tokenize
+from hashedindex.textparser import word_tokenize
 
 from hashedixsearch.analysis import SynonymAnalyzer
 from hashedixsearch._utils import (
@@ -113,7 +113,7 @@ class HashedIXSearch(object):
         unstemmed_tokens = self.tokenize(
             doc=doc,
             ngrams=1,
-            stemmer=NullStemmer(),
+            stemmer=None,
             retain_casing=True,
             retain_punctuation=True,
             retain_whitespace=True,
