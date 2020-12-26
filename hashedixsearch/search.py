@@ -167,19 +167,13 @@ class HashedIXSearch(object):
 
             # Check for candidate term highlighting matches
             if not candidates and not _is_separator(token):
-                candidates = {
-                    term: term
-                    for term in terms
-                    if term[0] == token
-                }
+                candidates = {term: term for term in terms if term[0] == token}
                 accumulator = StringIO()
 
             # Advance the match window for each candidate term
             if not _is_separator(token):
                 candidates = {
-                    term: term[1:]
-                    for term in candidates.values()
-                    if term[0] == token
+                    term: term[1:] for term in candidates.values() if term[0] == token
                 }
 
             output = escape(ngram[0])
