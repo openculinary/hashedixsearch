@@ -109,6 +109,33 @@ class HashedIXSearch(object):
             if frequency == doc_length:
                 return doc_id
 
+    def _unstemmed_ngrams(self, doc, max_n):
+        results = []
+        for tokens in self.tokenize(
+            doc=doc,
+            ngrams=max_n,
+            stemmer=NullStemmer(),
+            retain_casing=True,
+            retain_punctuation=True,
+            retain_whitespace=True,
+        ):
+            if len(tokens) < max_n:
+                break
+            results.append(tokens)
+
+        # If we did not generate any ngrams, do not attempt highlighting
+        if not results:
+            return
+
+        # Tail the ngram list with suffixes of the final ngram
+        final_ngram = results[-1]
+        for n in range(1, max_n + 1):
+            results.append(final_ngram[n:])
+
+        # Remove the end-of-stream ngram
+        results.pop()
+        return results
+
     def _next_token(self, ngram, case_sensitive):
         return next(
             self.tokenize(
@@ -126,32 +153,10 @@ class HashedIXSearch(object):
 
         max_n = max(len(term) for term in terms)
         term_attributes = term_attributes or {}
+        ngrams = self._unstemmed_ngrams(doc, max_n)
 
-        # Generate unstemmed ngrams of the maximum term length
-        ngrams = []
-        for tokens in self.tokenize(
-            doc=doc,
-            ngrams=max_n,
-            stemmer=NullStemmer(),
-            retain_casing=True,
-            retain_punctuation=True,
-            retain_whitespace=True,
-        ):
-            if len(tokens) < max_n:
-                break
-            ngrams.append(tokens)
-
-        # If we did not generate any ngrams, do not attempt highlighting
         if not ngrams:
             return escape(doc)
-
-        # Tail the ngram list with ngrams of decreasing length
-        final_ngram = ngrams[-1]
-        for n in range(1, max_n + 1):
-            ngrams.append(final_ngram[n:])
-
-        # Remove the end-of-stream ngram
-        ngrams.pop()
 
         # Build up a marked-up representation of the original document
         candidates = {}
