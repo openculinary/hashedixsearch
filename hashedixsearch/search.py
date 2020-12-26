@@ -161,10 +161,6 @@ class HashedIXSearch(object):
         ngrams = iter(ngrams)
         while ngram := next(ngrams):
 
-            # Stop when we reach an empty end-of-stream ngram
-            if not ngram:
-                break
-
             # Determine whether any of the highlighting terms match
             ngram_term = self._ngram_to_term(ngram, case_sensitive)
 
