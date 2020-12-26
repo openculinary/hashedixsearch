@@ -152,13 +152,15 @@ class HashedIXSearch(object):
         for n in range(1, max_n + 1):
             ngrams.append(final_ngram[n:])
 
+        # Remove the end-of-stream ngram
+        ngrams.pop()
+
         # Build up a marked-up representation of the original document
         candidates = {}
         accumulator = None
         markup = StringIO()
 
-        ngrams = iter(ngrams)
-        while ngram := next(ngrams):
+        for ngram in ngrams:
 
             # Check for candidate term highlighting matches
             ngram_term = self._ngram_to_term(ngram, case_sensitive)
@@ -184,14 +186,12 @@ class HashedIXSearch(object):
                 }
 
             # Render highlight markup once a candidate's terms are consumed
-            for closing_term, remaining_tokens in candidates.items():
-                if remaining_tokens:
-                    continue
-                attributes = term_attributes.get(closing_term)
+            term = next(filter(lambda k: not candidates[k], candidates), None)
+            if term:
+                attributes = term_attributes.get(term)
                 token = _render_match(accumulator, attributes)
                 candidates = {}
                 accumulator = None
-                break
 
             # Write tokens to the output stream
             if not candidates:
