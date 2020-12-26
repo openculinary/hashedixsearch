@@ -164,7 +164,7 @@ class HashedIXSearch(object):
             # Check for candidate term highlighting matches
             ngram_term = self._ngram_to_term(ngram, case_sensitive)
             if not candidates and not _is_separator(ngram_term[0]):
-                candidates = _candidate_matches(ngram_term, terms)
+                candidates = _candidate_matches(ngram_term[0], terms)
                 accumulator = StringIO()
 
             # Consume one token at a time
