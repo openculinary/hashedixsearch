@@ -162,9 +162,8 @@ class HashedIXSearch(object):
         ngrams = iter(ngrams)
         while ngram := next(ngrams):
 
-            # Determine whether any of the highlighting terms match
+            # Check for candidate term highlighting matches
             ngram_term = self._ngram_to_term(ngram, case_sensitive)
-
             if not candidates and not _is_separator(ngram_term[0]):
                 candidates = _candidate_matches(ngram_term, terms)
                 accumulator = StringIO()
@@ -174,7 +173,7 @@ class HashedIXSearch(object):
             if candidates:
                 accumulator.write(token)
 
-            # Advance the match window of each candidate element
+            # Advance the match window for each candidate term
             if not _is_separator(ngram_term[0]):
                 candidates = {
                     term: tokens[1:]
@@ -182,7 +181,7 @@ class HashedIXSearch(object):
                     if tokens[0] == ngram_term[0]
                 }
 
-            # Close the markup when any term's tokens have been consumed
+            # Render highlight markup once a candidate's terms are consumed
             for closing_term, remaining_tokens in candidates.items():
                 if remaining_tokens:
                     continue
@@ -192,7 +191,7 @@ class HashedIXSearch(object):
                 accumulator = None
                 break
 
-            # Output accumulated tokens whenever candidate matching is complete
+            # Write tokens to the output stream
             if not candidates:
                 markup.write(token)
 
