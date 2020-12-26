@@ -183,9 +183,9 @@ class HashedIXSearch(object):
                 accumulator.write(output)
 
             # Render highlight markup once a candidate's terms are consumed
-            term = next(filter(lambda k: not candidates[k], candidates), None)
-            if term:
-                attributes = term_attributes.get(term)
+            emit = next(filter(lambda k: not candidates[k], candidates), None)
+            if emit:
+                attributes = term_attributes.get(emit)
                 output = _render_match(accumulator, attributes)
                 candidates = {}
                 accumulator = None
