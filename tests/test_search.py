@@ -296,7 +296,7 @@ class TestSearch(unittest.TestCase):
 
     def test_term_attributes_phrase_query(self):
         doc = "place in the bread maker"
-        term = ("bread", "maker",)
+        term = ("bread", "maker")
 
         terms = [term]
         term_attributes = {term: {"id": "example"}}
