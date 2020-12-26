@@ -12,26 +12,6 @@ def _is_separator(token):
     return False
 
 
-def _candidate_matches(token, terms):
-
-    # Open an iterator over each candidate term's tokens
-    candidates = {term: iter(term) for term in terms}
-
-    # Narrow the list of candidates to those that continue to match
-    candidates = {
-        term: remaining_tokens
-        for term, remaining_tokens in candidates.items()
-        if next(remaining_tokens, None) == token
-    }
-
-    # Return the candidate terms along with copies of their token lists
-    return {
-        term: term
-        for term in terms
-        if term in candidates
-    }
-
-
 def _render_match(cstring, attributes):
     element = Element("mark", attributes or {})
     element.text = cstring.getvalue()

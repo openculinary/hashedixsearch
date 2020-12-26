@@ -7,7 +7,6 @@ from hashedindex.textparser import NullStemmer, word_tokenize
 
 from hashedixsearch.analysis import SynonymAnalyzer
 from hashedixsearch._utils import (
-    _candidate_matches,
     _is_separator,
     _render_match,
 )
@@ -164,7 +163,11 @@ class HashedIXSearch(object):
             # Check for candidate term highlighting matches
             ngram_term = self._ngram_to_term(ngram, case_sensitive)
             if not candidates and not _is_separator(ngram_term[0]):
-                candidates = _candidate_matches(ngram_term[0], terms)
+                candidates = {
+                    term: term
+                    for term in terms
+                    if term[0] == ngram_term[0]
+                }
                 accumulator = StringIO()
 
             # Consume one token at a time
@@ -175,9 +178,9 @@ class HashedIXSearch(object):
             # Advance the match window for each candidate term
             if not _is_separator(ngram_term[0]):
                 candidates = {
-                    term: tokens[1:]
-                    for term, tokens in candidates.items()
-                    if tokens[0] == ngram_term[0]
+                    term: term[1:]
+                    for term in candidates.values()
+                    if term[0] == ngram_term[0]
                 }
 
             # Render highlight markup once a candidate's terms are consumed
