@@ -181,11 +181,13 @@ class HashedIXSearch(object):
                 }
 
                 # Close the markup when any term's tokens have been consumed
-                closing_term = next(filter(lambda k: not candidates[k], candidates), None)
-                if closing_term:
+                for closing_term, remaining_tokens in candidates.items():
+                    if remaining_tokens:
+                        continue
                     attributes = term_attributes.get(closing_term)
                     accumulator = _render_match(accumulator, attributes)
                     candidates = None
+                    break
 
             # Output accumulated tokens whenever candidate matching is complete
             if candidates is None:
