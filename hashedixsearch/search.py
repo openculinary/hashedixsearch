@@ -111,7 +111,7 @@ class HashedIXSearch(object):
             if frequency == doc_length:
                 return doc_id
 
-    def _ngram_to_term(self, ngram, case_sensitive):
+    def _next_token(self, ngram, case_sensitive):
         return next(
             self.tokenize(
                 doc=str().join(ngram),
@@ -119,7 +119,7 @@ class HashedIXSearch(object):
                 retain_punctuation=True,
                 retain_whitespace=True,
             )
-        )
+        )[0]
 
     def highlight(self, doc, terms, case_sensitive=True, term_attributes=None):
         # If no terms are provided to match on, do not attempt highlighting
@@ -162,40 +162,41 @@ class HashedIXSearch(object):
 
         for ngram in ngrams:
 
+            # Consume one token at a time
+            token = self._next_token(ngram, case_sensitive)
+
             # Check for candidate term highlighting matches
-            ngram_term = self._ngram_to_term(ngram, case_sensitive)
-            if not candidates and not _is_separator(ngram_term[0]):
+            if not candidates and not _is_separator(token):
                 candidates = {
                     term: term
                     for term in terms
-                    if term[0] == ngram_term[0]
+                    if term[0] == token
                 }
                 accumulator = StringIO()
 
-            # Consume one token at a time
-            token = escape(ngram[0])
-            if candidates:
-                accumulator.write(token)
-
             # Advance the match window for each candidate term
-            if not _is_separator(ngram_term[0]):
+            if not _is_separator(token):
                 candidates = {
                     term: term[1:]
                     for term in candidates.values()
-                    if term[0] == ngram_term[0]
+                    if term[0] == token
                 }
+
+            output = escape(ngram[0])
+            if candidates:
+                accumulator.write(output)
 
             # Render highlight markup once a candidate's terms are consumed
             term = next(filter(lambda k: not candidates[k], candidates), None)
             if term:
                 attributes = term_attributes.get(term)
-                token = _render_match(accumulator, attributes)
+                output = _render_match(accumulator, attributes)
                 candidates = {}
                 accumulator = None
 
             # Write tokens to the output stream
             if not candidates:
-                markup.write(token)
+                markup.write(output)
 
         if accumulator:
             markup.write(accumulator.getvalue())
