@@ -7,15 +7,16 @@
 ```python
 from hashedixsearch import HashedIXSearch
 
+doc = 'find the needle in the haystack'
+
 index = HashedIXSearch(synonyms={'search': 'find'})
-index.add(
-    doc_id=1,
-    doc='find the needle in the haystack'
-)
+index.add(doc_id=1, doc=doc)
 
 results = index.query_batch(['search'])
 for query, hits in results:
-    print(f'{query}: {hits}')
+    for hit in hits:
+        # <mark>find</mark> the needle in the haystack
+        markup = index.highlight(doc=doc, terms=hit['terms'])
 ```
 
 ## Tests
