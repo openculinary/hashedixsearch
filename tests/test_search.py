@@ -294,6 +294,18 @@ class TestSearch(unittest.TestCase):
 
         assert markup == '<mark id="example">garlic</mark>'
 
+    def test_term_attributes_phrase_query(self):
+        doc = "place in the bread maker"
+        term = ("bread", "maker",)
+
+        terms = [term]
+        term_attributes = {term: {"id": "example"}}
+
+        index = HashedIXSearch()
+        markup = index.highlight(doc, terms, term_attributes=term_attributes)
+
+        assert markup == 'place in the <mark id="example">bread maker</mark>'
+
     def test_hit_scoring(self):
         precise_match = "garlic"
         imprecise_match = "clove garlic"

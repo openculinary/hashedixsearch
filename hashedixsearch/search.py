@@ -167,10 +167,11 @@ class HashedIXSearch(object):
 
             # Advance the match window for each candidate term
             if not _is_separator(token):
+                candidates = candidates or {term: term for term in terms}
                 candidates = {
-                    term: term[1:]
-                    for term in candidates.values() or terms
-                    if term[0] == token
+                    term: tokens[1:]
+                    for term, tokens in candidates.items()
+                    if tokens[0] == token
                 }
 
             # Prepare the current token for output, and write it to the
