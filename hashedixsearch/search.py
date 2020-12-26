@@ -176,4 +176,4 @@ class HashedIXSearch(object):
                 markup.write(output)
 
         markup.write(accumulator.getvalue())
-        return str(markup.getvalue())
+        return markup.getvalue()
