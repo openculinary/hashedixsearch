@@ -156,8 +156,8 @@ class HashedIXSearch(object):
 
         # Build up a marked-up representation of the original document
         candidates = None
+        accumulator = None
         markup = StringIO()
-        accumulator = StringIO()
 
         ngrams = iter(ngrams)
         while ngram := next(ngrams):
@@ -167,11 +167,12 @@ class HashedIXSearch(object):
 
             if not candidates and not _is_separator(ngram_term[0]):
                 candidates = _candidate_matches(ngram_term, terms)
-                markup.write(accumulator.getvalue())
                 accumulator = StringIO()
 
             # Consume one token at a time
-            accumulator.write(escape(ngram[0]))
+            token = escape(ngram[0])
+            if candidates:
+                accumulator.write(token)
 
             # Advance the match window of each candidate element
             if candidates and not _is_separator(ngram_term[0]):
@@ -186,14 +187,15 @@ class HashedIXSearch(object):
                     if remaining_tokens:
                         continue
                     attributes = term_attributes.get(closing_term)
-                    accumulator = StringIO(_render_match(accumulator, attributes))
+                    token = _render_match(accumulator, attributes)
                     candidates = None
+                    accumulator = None
                     break
 
             # Output accumulated tokens whenever candidate matching is complete
-            if candidates is None:
-                markup.write(accumulator.getvalue())
-                accumulator = StringIO()
+            if not candidates:
+                markup.write(token)
 
-        markup.write(accumulator.getvalue())
+        if accumulator:
+            markup.write(accumulator.getvalue())
         return markup.getvalue()
