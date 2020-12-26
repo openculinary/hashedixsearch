@@ -157,7 +157,7 @@ class HashedIXSearch(object):
 
         # Build up a marked-up representation of the original document
         candidates = {}
-        accumulator = None
+        accumulator = StringIO()
         markup = StringIO()
 
         for ngram in ngrams:
@@ -165,17 +165,12 @@ class HashedIXSearch(object):
             # Consume one token at a time
             token = self._next_token(ngram, case_sensitive)
 
-            # Check for candidate term highlighting matches
-            if not candidates and not _is_separator(token):
-                candidates = {term: term for term in terms if term[0] == token}
-                accumulator = StringIO()
-
             # Advance the match window for each candidate term
             if not _is_separator(token):
                 candidates = {
-                    term: tokens[1:]
-                    for term, tokens in candidates.items()
-                    if tokens[0] == token
+                    term: term[1:]
+                    for term in candidates.values() or terms
+                    if term[0] == token
                 }
 
             output = escape(ngram[0])
@@ -188,7 +183,7 @@ class HashedIXSearch(object):
                 attributes = term_attributes.get(emit)
                 output = _render_match(accumulator, attributes)
                 candidates = {}
-                accumulator = None
+                accumulator = StringIO()
 
             # Write tokens to the output stream
             if not candidates:
