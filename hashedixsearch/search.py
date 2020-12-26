@@ -154,7 +154,7 @@ class HashedIXSearch(object):
             ngrams.append(final_ngram[n:])
 
         # Build up a marked-up representation of the original document
-        tag = None
+        candidates = None
         markup = ""
         accumulator = ""
 
@@ -164,33 +164,31 @@ class HashedIXSearch(object):
             # Determine whether any of the highlighting terms match
             ngram_term = self._ngram_to_term(ngram, case_sensitive)
 
-            if not tag and not _is_separator(ngram_term[0]):
-                tag = _candidate_matches(ngram_term, terms)
+            if not candidates and not _is_separator(ngram_term[0]):
+                candidates = _candidate_matches(ngram_term, terms)
                 markup += accumulator
                 accumulator = ""
 
             # Consume one token at a time
             accumulator += escape(ngram[0])
-            emit = tag is None
 
-            # Advance the match window of each candidate tag element
-            if tag and not _is_separator(ngram_term[0]):
-                tag = {
+            # Advance the match window of each candidate element
+            if candidates and not _is_separator(ngram_term[0]):
+                candidates = {
                     term: tokens[1:]
-                    for term, tokens in tag.items()
+                    for term, tokens in candidates.items()
                     if tokens[0] == ngram_term[0]
                 }
 
                 # Close the markup when any term's tokens have been consumed
-                closing_term = next(filter(lambda k: not tag[k], tag), None)
+                closing_term = next(filter(lambda k: not candidates[k], candidates), None)
                 if closing_term:
                     attributes = term_attributes.get(closing_term)
                     accumulator = _render_match(accumulator, attributes)
-                    emit = True
-                    tag = None
+                    candidates = None
 
-            # Output accumulated tokens when we encounter emit-points
-            if emit:
+            # Output accumulated tokens whenever candidate matching is complete
+            if candidates is None:
                 markup += accumulator
                 accumulator = ""
 
