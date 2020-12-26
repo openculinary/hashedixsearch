@@ -155,7 +155,7 @@ class HashedIXSearch(object):
             ngrams.append(final_ngram[n:])
 
         # Build up a marked-up representation of the original document
-        candidates = None
+        candidates = {}
         accumulator = None
         markup = StringIO()
 
@@ -182,15 +182,15 @@ class HashedIXSearch(object):
                     if tokens[0] == ngram_term[0]
                 }
 
-                # Close the markup when any term's tokens have been consumed
-                for closing_term, remaining_tokens in candidates.items():
-                    if remaining_tokens:
-                        continue
-                    attributes = term_attributes.get(closing_term)
-                    token = _render_match(accumulator, attributes)
-                    candidates = None
-                    accumulator = None
-                    break
+            # Close the markup when any term's tokens have been consumed
+            for closing_term, remaining_tokens in candidates.items():
+                if remaining_tokens:
+                    continue
+                attributes = term_attributes.get(closing_term)
+                token = _render_match(accumulator, attributes)
+                candidates = {}
+                accumulator = None
+                break
 
             # Output accumulated tokens whenever candidate matching is complete
             if not candidates:
