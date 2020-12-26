@@ -15,7 +15,7 @@ def _is_separator(token):
 def _candidate_matches(ngram, terms):
 
     # Open an iterator over each candidate term's tokens
-    candidates = {term: iter(tokens) for term, tokens in terms.items()}
+    candidates = {term: iter(term) for term in terms}
 
     # Step through the input ngram
     tokens = iter(ngram)
@@ -34,8 +34,8 @@ def _candidate_matches(ngram, terms):
 
     # Return the candidate terms along with copies of their token lists
     return {
-        term: list(remaining_tokens)
-        for term, remaining_tokens in terms.items()
+        term: term
+        for term in terms
         if term in candidates
     }
 

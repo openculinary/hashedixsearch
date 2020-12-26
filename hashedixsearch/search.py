@@ -127,8 +127,7 @@ class HashedIXSearch(object):
         if not terms:
             return escape(doc)
 
-        terms = {term: list(term) for term in terms}
-        max_n = max(len(term) for term in terms.values())
+        max_n = max(len(term) for term in terms)
         term_attributes = term_attributes or {}
 
         # Generate unstemmed ngrams of the maximum term length
