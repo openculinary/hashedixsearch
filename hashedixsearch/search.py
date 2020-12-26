@@ -109,53 +109,36 @@ class HashedIXSearch(object):
             if frequency == doc_length:
                 return doc_id
 
-    def _unstemmed_ngrams(self, doc, max_n):
-        results = []
-        for tokens in self.tokenize(
+    def _token_pairs(self, doc, case_sensitive):
+        unstemmed_tokens = self.tokenize(
             doc=doc,
-            ngrams=max_n,
+            ngrams=1,
             stemmer=NullStemmer(),
             retain_casing=True,
             retain_punctuation=True,
             retain_whitespace=True,
-        ):
-            if len(tokens) < max_n:
-                break
-            results.append(tokens)
-
-        # If we did not generate any ngrams, do not attempt highlighting
-        if not results:
-            return
-
-        # Tail the ngram list with suffixes of the final ngram
-        final_ngram = results[-1]
-        for n in range(1, max_n + 1):
-            results.append(final_ngram[n:])
-
-        # Remove the end-of-stream ngram
-        results.pop()
-        return results
-
-    def _next_token(self, ngram, case_sensitive):
-        return next(
-            self.tokenize(
-                doc=str().join(ngram),
-                retain_casing=case_sensitive,
-                retain_punctuation=True,
-                retain_whitespace=True,
+        )
+        while unstemmed_token := next(unstemmed_tokens):
+            stemmed_token = next(
+                self.tokenize(
+                    doc=unstemmed_token[0],
+                    ngrams=1,
+                    retain_casing=case_sensitive,
+                    retain_punctuation=True,
+                    retain_whitespace=True,
+                )
             )
-        )[0]
+            yield unstemmed_token[0], stemmed_token[0]
 
     def highlight(self, doc, terms, case_sensitive=True, term_attributes=None):
         # If no terms are provided to match on, do not attempt highlighting
         if not terms:
             return escape(doc)
 
-        max_n = max(len(term) for term in terms)
         term_attributes = term_attributes or {}
-        ngrams = self._unstemmed_ngrams(doc, max_n)
+        token_pairs = self._token_pairs(doc, case_sensitive)
 
-        if not ngrams:
+        if not token_pairs:
             return escape(doc)
 
         # Build up a marked-up representation of the original document
@@ -163,23 +146,20 @@ class HashedIXSearch(object):
         accumulator = StringIO()
         markup = StringIO()
 
-        for ngram in ngrams:
-
-            # Consume one token at a time
-            token = self._next_token(ngram, case_sensitive)
+        for unstemmed_token, stemmed_token in token_pairs:
 
             # Advance the match window for each candidate term
-            if not _is_separator(token):
+            if not _is_separator(stemmed_token):
                 candidates = candidates or {term: term for term in terms}
                 candidates = {
                     term: tokens[1:]
                     for term, tokens in candidates.items()
-                    if tokens[0] == token
+                    if tokens[0] == stemmed_token
                 }
 
             # Prepare the current token for output, and write it to the
             # accumulator buffer if we are within candidate highlight tokens
-            output = escape(ngram[0])
+            output = escape(unstemmed_token)
             if candidates:
                 accumulator.write(output)
 
@@ -196,4 +176,4 @@ class HashedIXSearch(object):
                 markup.write(output)
 
         markup.write(accumulator.getvalue())
-        return markup.getvalue()
+        return str(markup.getvalue())
