@@ -173,6 +173,8 @@ class HashedIXSearch(object):
                     if term[0] == token
                 }
 
+            # Prepare the current token for output, and write it to the
+            # accumulator buffer if we are within candidate highlight tokens
             output = escape(ngram[0])
             if candidates:
                 accumulator.write(output)
@@ -185,7 +187,7 @@ class HashedIXSearch(object):
                 candidates = {}
                 accumulator = StringIO()
 
-            # Write tokens to the output stream
+            # Write output to the markup stream when match candidates are empty
             if not candidates:
                 markup.write(output)
 
