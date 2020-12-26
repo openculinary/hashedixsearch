@@ -22,10 +22,8 @@ def _candidate_matches(ngram, terms):
     while token := next(tokens, None):
 
         # Skip past separator tokens
-        while _is_separator(token):
-            token = next(tokens, None)
-        if not token:
-            break
+        if _is_separator(token):
+            continue
 
         # Narrow the list of candidates to those that continue to match
         candidates = {
