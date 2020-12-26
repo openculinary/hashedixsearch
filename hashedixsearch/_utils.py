@@ -3,8 +3,6 @@ from xml.etree.ElementTree import Element, tostring
 
 
 def _is_separator(token):
-    if token is None:
-        return False
     if token.isspace():
         return True
     if token.strip(punctuation) == str():
