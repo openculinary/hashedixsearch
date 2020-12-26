@@ -173,7 +173,9 @@ class HashedIXSearch(object):
             # Advance the match window for each candidate term
             if not _is_separator(token):
                 candidates = {
-                    term: term[1:] for term in candidates.values() if term[0] == token
+                    term: tokens[1:]
+                    for term, tokens in candidates.items()
+                    if tokens[0] == token
                 }
 
             output = escape(ngram[0])
