@@ -81,9 +81,9 @@ class HashedIXSearch(object):
             for doc_id in doc_ids:
                 doc_length = self.index.get_document_length(doc_id)
                 tf = self.index.get_term_frequency(term, doc_id)
-                count[doc_id] += tf
                 hits[doc_id] += len(term) * tf / doc_length
                 terms[doc_id].append(term)
+                count[doc_id] += tf
         return sorted(
             [
                 {
