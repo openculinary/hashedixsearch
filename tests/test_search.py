@@ -130,11 +130,12 @@ class TestSearch(unittest.TestCase):
     def test_highlighting_case_insensitive_phrase(self):
         doc = "Place in Dutch Oven, and leave for one hour"
         term = ("dutch", "oven")
+        expected = "Place in <mark>Dutch Oven</mark>, and leave for one hour"
 
         index = HashedIXSearch()
         markup = index.highlight(doc, [term], case_sensitive=False)
 
-        assert markup == "Place in <mark>Dutch Oven</mark>, and leave for one hour"
+        assert markup == expected
 
     def test_highlighting_partial_match_ignored(self):
         doc = "Place in Dutch oven, and leave for one hour"
@@ -148,11 +149,12 @@ class TestSearch(unittest.TestCase):
     def test_highlighting_repeat_match(self):
         doc = "daal daal daal"
         term = ("daal",)
+        expected = "<mark>daal</mark> <mark>daal</mark> <mark>daal</mark>"
 
         index = HashedIXSearch()
         markup = index.highlight(doc, [term])
 
-        assert markup == "<mark>daal</mark> <mark>daal</mark> <mark>daal</mark>"
+        assert markup == expected
 
     def test_highlighting_empty_terms(self):
         doc = "mushrooms"
@@ -203,12 +205,12 @@ class TestSearch(unittest.TestCase):
         assert markup == "<mark>soy milk</mark>."
 
     def test_phrase_multi_term_highlighting(self):
-        doc = "put the skewers in the frying pan"
+        doc = "put the skewer in the frying pan"
         terms = [
             ("skewer",),
             ("frying", "pan"),
         ]
-        expected = "put the <mark>skewers</mark> in the <mark>frying pan</mark>"
+        expected = "put the <mark>skewer</mark> in the <mark>frying pan</mark>"
 
         stemmer = self.NaivePluralStemmer()
         index = HashedIXSearch(stemmer=stemmer)

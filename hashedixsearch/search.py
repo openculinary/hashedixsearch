@@ -19,27 +19,27 @@ class HashedIXSearch(object):
         stemmer=None,
         stopwords=None,
         synonyms=None,
-        retain_casing=False,
-        retain_punctuation=False,
-        retain_whitespace=False,
+        casing=False,
+        punctuation=False,
+        whitespace=False,
     ):
         self.index = HashedIndex()
         self.ngrams = ngrams
         self.stemmer = stemmer
         self.stopwords = stopwords
         self.synonyms = synonyms
-        self.retain_casing = retain_casing
-        self.retain_punctuation = retain_punctuation
-        self.retain_whitespace = retain_whitespace
+        self.casing = casing
+        self.punctuation = punctuation
+        self.whitespace = whitespace
 
     def tokenize(self, doc, **kwargs):
         ngrams = kwargs.get("ngrams", self.ngrams)
         stemmer = kwargs.get("stemmer", self.stemmer)
         stopwords = kwargs.get("stopwords", self.stopwords)
         synonyms = kwargs.get("synonyms", self.synonyms)
-        retain_casing = kwargs.get("retain_casing", self.retain_casing)
-        retain_punctuation = kwargs.get("retain_punctuation", self.retain_punctuation)
-        retain_whitespace = kwargs.get("retain_whitespace", self.retain_whitespace)
+        casing = kwargs.get("casing", self.casing)
+        punctuation = kwargs.get("punctuation", self.punctuation)
+        whitespace = kwargs.get("whitespace", self.whitespace)
 
         if synonyms:
             analyzer = SynonymAnalyzer(synonyms)
@@ -52,9 +52,9 @@ class HashedIXSearch(object):
                 stemmer=stemmer,
                 stopwords=stopwords or [],
                 ignore_numeric=False,
-                retain_casing=retain_casing,
-                retain_punctuation=retain_punctuation,
-                tokenize_whitespace=retain_whitespace,
+                retain_casing=casing,
+                retain_punctuation=punctuation,
+                tokenize_whitespace=whitespace,
             )
 
         # Produce an end-of-stream marker
@@ -114,18 +114,18 @@ class HashedIXSearch(object):
             doc=doc,
             ngrams=1,
             stemmer=None,
-            retain_casing=True,
-            retain_punctuation=True,
-            retain_whitespace=True,
+            casing=True,
+            punctuation=True,
+            whitespace=True,
         )
         while unstemmed_token := next(unstemmed_tokens):
             stemmed_token = next(
                 self.tokenize(
                     doc=unstemmed_token[0],
                     ngrams=1,
-                    retain_casing=case_sensitive,
-                    retain_punctuation=True,
-                    retain_whitespace=True,
+                    casing=case_sensitive,
+                    punctuation=True,
+                    whitespace=True,
                 )
             )
             yield unstemmed_token[0], stemmed_token[0]
