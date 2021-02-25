@@ -157,6 +157,11 @@ class HashedIXSearch(object):
                     if tokens[0] == stemmed_token
                 }
 
+            # We had a partial match, but it was lost
+            if accumulator.tell() and not candidates:
+                markup.write(accumulator.getvalue())
+                accumulator = StringIO()
+
             # Prepare the current token for output, and write it to the
             # accumulator buffer if we are within candidate highlight tokens
             output = escape(unstemmed_token)
