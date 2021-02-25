@@ -13,7 +13,7 @@ class TestAnalysis(unittest.TestCase):
         analyzer = WhitespacePunctuationTokenAnalyzer()
         tokens = list(analyzer.process(doc))
 
-        assert tokens == ["coriander", ",", " ", "chopped"]
+        self.assertEqual(tokens, ["coriander", ",", " ", "chopped"])
 
     def test_token_synonyms(self):
         doc = "soymilk."
@@ -22,4 +22,4 @@ class TestAnalysis(unittest.TestCase):
         analyzer = SynonymAnalyzer(synonyms=synonyms)
         tokens = list(analyzer.process(doc))
 
-        assert tokens == ["soy", " ", "milk", "."]
+        self.assertEqual(tokens, ["soy", " ", "milk", "."])

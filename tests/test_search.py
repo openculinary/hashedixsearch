@@ -23,7 +23,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch(stopwords=stopwords)
         tokens = list(index.tokenize(doc=doc))
 
-        assert tokens[0] == ("red", "bell", "pepper")
+        self.assertEqual(tokens[0], ("red", "bell", "pepper"))
 
     def test_token_stemming(self):
         doc = "onions"
@@ -32,7 +32,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch()
         tokens = list(index.tokenize(doc=doc, stemmer=stemmer))
 
-        assert tokens[0] == ("onion",)
+        self.assertEqual(tokens[0], ("onion",))
 
     def test_query(self):
         doc = "mayonnaise"
@@ -41,7 +41,7 @@ class TestSearch(unittest.TestCase):
         index.add(0, doc)
         hits = index.query(doc)
 
-        assert list(hits)
+        self.assertTrue(list(hits))
 
     def test_batch_query(self):
         docs = ["tomato", "onion"]
@@ -55,8 +55,8 @@ class TestSearch(unittest.TestCase):
             hits = index.query(doc)
             results.append(hits)
 
-        assert len(results) == 2
-        assert all([hits for hits in results])
+        self.assertEqual(len(results), 2)
+        self.assertTrue(all([hits for hits in results]))
 
     def test_analysis_consistency(self):
         doc = "soymilk"
@@ -66,7 +66,7 @@ class TestSearch(unittest.TestCase):
         index.add(0, "soymilk")
         hits = index.query("soy milk")
 
-        assert list(hits)
+        self.assertTrue(list(hits))
 
     def test_exact_match(self):
         doc = "whole onion"
@@ -76,7 +76,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch(stopwords=stopwords)
         index.add(0, doc)
 
-        assert index.query_exact(term) == 0
+        self.assertEqual(index.query_exact(term), 0)
 
     def test_exact_match_duplicate(self):
         doc = "whole onion"
@@ -87,7 +87,7 @@ class TestSearch(unittest.TestCase):
         index.add(0, doc)
         index.add(0, doc)
 
-        assert index.query_exact(term) == 0
+        self.assertEqual(index.query_exact(term), 0)
 
     def test_highlighting(self):
         doc = "five onions, diced"
@@ -97,7 +97,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch(stemmer=stemmer)
         markup = index.highlight(doc, [term])
 
-        assert markup == "five <mark>onions</mark>, diced"
+        self.assertEqual(markup, "five <mark>onions</mark>, diced")
 
     def test_highlighting_escaping(self):
         doc = "egg & bacon"
@@ -107,7 +107,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch(stemmer=stemmer)
         markup = index.highlight(doc, terms)
 
-        assert markup == "<mark>egg</mark> &amp; <mark>bacon</mark>"
+        self.assertEqual(markup, "<mark>egg</mark> &amp; <mark>bacon</mark>")
 
     def test_highlighting_unstemmed(self):
         doc = "one carrot"
@@ -116,7 +116,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch()
         markup = index.highlight(doc, [term])
 
-        assert markup == "one <mark>carrot</mark>"
+        self.assertEqual(markup, "one <mark>carrot</mark>")
 
     def test_highlighting_case_insensitive_term(self):
         doc = "Wine"
@@ -125,7 +125,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch()
         markup = index.highlight(doc, [term], case_sensitive=False)
 
-        assert markup == "<mark>Wine</mark>"
+        self.assertEqual(markup, "<mark>Wine</mark>")
 
     def test_highlighting_case_insensitive_phrase(self):
         doc = "Place in Dutch Oven, and leave for one hour"
@@ -135,7 +135,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch()
         markup = index.highlight(doc, [term], case_sensitive=False)
 
-        assert markup == expected
+        self.assertEqual(markup, expected)
 
     def test_highlighting_partial_match_ignored(self):
         doc = "Place in Dutch oven, and leave for one hour"
@@ -144,7 +144,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch()
         markup = index.highlight(doc, [term])
 
-        assert markup == "Place in Dutch oven, and leave for one hour"
+        self.assertEqual(markup, "Place in Dutch oven, and leave for one hour")
 
     def test_highlighting_repeat_match(self):
         doc = "daal daal daal"
@@ -154,7 +154,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch()
         markup = index.highlight(doc, [term])
 
-        assert markup == expected
+        self.assertEqual(markup, expected)
 
     def test_highlighting_empty_terms(self):
         doc = "mushrooms"
@@ -162,7 +162,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch()
         markup = index.highlight(doc, [])
 
-        assert markup == doc
+        self.assertEqual(markup, doc)
 
     def test_highlighting_term_larger_than_query(self):
         doc = "tofu"
@@ -172,7 +172,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch(stemmer=stemmer)
         markup = index.highlight(doc, [term])
 
-        assert markup == "tofu"
+        self.assertEqual(markup, "tofu")
 
     def test_phrase_term_highlighting(self):
         doc = "can of baked beans"
@@ -182,7 +182,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch(stemmer=stemmer)
         markup = index.highlight(doc, [term])
 
-        assert markup == "can of <mark>baked beans</mark>"
+        self.assertEqual(markup, "can of <mark>baked beans</mark>")
 
     def test_trigram_phrase_term_highlighting(self):
         doc = "sliced red bell pepper as filling"
@@ -191,7 +191,9 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch()
         markup = index.highlight(doc, [term])
 
-        assert markup == "sliced <mark>red bell pepper</mark> as filling"
+        self.assertEqual(
+            markup, "sliced <mark>red bell pepper</mark> as filling"
+        )
 
     def test_synonym_highlighting(self):
         doc = "soymilk."
@@ -202,7 +204,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch(stemmer=stemmer, synonyms=synonyms)
         markup = index.highlight(doc, [term])
 
-        assert markup == "<mark>soy milk</mark>."
+        self.assertEqual(markup, "<mark>soy milk</mark>.")
 
     def test_phrase_multi_term_highlighting(self):
         doc = "put the skewer in the frying pan"
@@ -216,7 +218,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch(stemmer=stemmer)
         markup = index.highlight(doc, terms)
 
-        assert markup == expected
+        self.assertEqual(markup, expected)
 
     def test_phrase_multi_term_highlighting_extra(self):
         doc = "put the kebab skewers in the pan"
@@ -230,7 +232,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch(stemmer=stemmer)
         markup = index.highlight(doc, terms)
 
-        assert markup == expected
+        self.assertEqual(markup, expected)
 
     def test_highlighting_non_ascii(self):
         doc = "60 ml crème fraîche"
@@ -240,7 +242,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch(stemmer=stemmer)
         markup = index.highlight(doc, [term])
 
-        assert markup == "60 ml <mark>crème fraîche</mark>"
+        self.assertEqual(markup, "60 ml <mark>crème fraîche</mark>")
 
     def test_retain_numbers(self):
         doc = "preheat the oven to 300 degrees"
@@ -250,7 +252,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch()
         markup = index.highlight(doc, terms)
 
-        assert markup == expected
+        self.assertEqual(markup, expected)
 
     def test_retained_style(self):
         doc = "Step one, oven.  Phase two: pan."
@@ -261,7 +263,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch(stemmer=stemmer)
         markup = index.highlight(doc, terms)
 
-        assert markup == expected
+        self.assertEqual(markup, expected)
 
     def test_ambiguous_prefix(self):
         doc = "food mill."
@@ -271,7 +273,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch(stemmer=stemmer)
         markup = index.highlight(doc, terms)
 
-        assert markup == "<mark>food mill</mark>."
+        self.assertEqual(markup, "<mark>food mill</mark>.")
 
     def test_partial_suffix(self):
         doc = "medium onion"
@@ -281,7 +283,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch(stemmer=stemmer)
         markup = index.highlight(doc, terms)
 
-        assert markup == "medium onion"
+        self.assertEqual(markup, "medium onion")
 
     def test_term_attributes(self):
         doc = "garlic"
@@ -294,7 +296,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch(stemmer=stemmer)
         markup = index.highlight(doc, terms, term_attributes=term_attributes)
 
-        assert markup == '<mark id="example">garlic</mark>'
+        self.assertEqual(markup, '<mark id="example">garlic</mark>')
 
     def test_term_attributes_phrase_query(self):
         doc = "place in the bread maker"
@@ -306,7 +308,9 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch()
         markup = index.highlight(doc, terms, term_attributes=term_attributes)
 
-        assert markup == 'place in the <mark id="example">bread maker</mark>'
+        self.assertEqual(
+            markup, 'place in the <mark id="example">bread maker</mark>'
+        )
 
     def test_hit_scoring(self):
         precise_match = "garlic"
@@ -318,8 +322,8 @@ class TestSearch(unittest.TestCase):
 
         hits = index.query("garlic")
 
-        assert len(hits) == 2
-        assert hits[0]["doc_id"] == 0
+        self.assertEqual(len(hits), 2)
+        self.assertEqual(hits[0]["doc_id"], 0)
 
     def test_term_frequency_tiebreaker(self):
         infrequent_doc = "clove"
@@ -331,5 +335,5 @@ class TestSearch(unittest.TestCase):
 
         hits = index.query("garlic clove", query_limit=-1)
 
-        assert len(hits) == 2
-        assert hits[0]["doc_id"] == 1
+        self.assertEqual(len(hits), 2)
+        self.assertEqual(hits[0]["doc_id"], 1)
