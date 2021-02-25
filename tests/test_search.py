@@ -337,3 +337,13 @@ class TestSearch(unittest.TestCase):
 
         self.assertEqual(len(hits), 2)
         self.assertEqual(hits[0]["doc_id"], 1)
+
+    def test_partial_phrase_reoccurrence(self):
+        doc = "place the towel onto the place mat"
+        term = ("place", "mat")
+        expected = "place the towel onto the <mark>place mat</mark>"
+
+        index = HashedIXSearch()
+        markup = index.highlight(doc, [term])
+
+        self.assertEqual(markup, expected)
