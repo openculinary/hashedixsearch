@@ -347,3 +347,13 @@ class TestSearch(unittest.TestCase):
         markup = index.highlight(doc, [term])
 
         self.assertEqual(markup, expected)
+
+    def test_empty_term_handled(self):
+        doc = "empty term example"
+        term = tuple()
+        expected = "empty term example"
+
+        index = HashedIXSearch()
+        markup = index.highlight(doc, [term])
+
+        self.assertEqual(markup, expected)
