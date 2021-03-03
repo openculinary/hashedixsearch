@@ -150,7 +150,9 @@ class HashedIXSearch(object):
 
             # Advance the match window for each candidate term
             if not _is_separator(stemmed_token):
-                candidates = candidates or {term: term for term in terms}
+                candidates = candidates or {
+                    term: term for term in terms if term
+                }
                 candidates = {
                     term: tokens[1:]
                     for term, tokens in candidates.items()
