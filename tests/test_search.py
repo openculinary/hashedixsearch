@@ -156,6 +156,16 @@ class TestSearch(unittest.TestCase):
 
         self.assertEqual(markup, expected)
 
+    def test_highlighting_match_limit(self):
+        doc = "one two three"
+        terms = [("one",), ("two",), ("three",)]
+        expected = "<mark>one</mark> <mark>two</mark> three"
+
+        index = HashedIXSearch()
+        markup = index.highlight(doc, terms, limit=2)
+
+        self.assertEqual(markup, expected)
+
     def test_highlighting_empty_terms(self):
         doc = "mushrooms"
 
