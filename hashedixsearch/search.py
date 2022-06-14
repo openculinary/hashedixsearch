@@ -130,11 +130,19 @@ class HashedIXSearch(object):
             )
             yield unstemmed_token[0], stemmed_token[0]
 
-    def highlight(self, doc, terms, case_sensitive=True, term_attributes=None):
+    def highlight(
+        self,
+        doc,
+        terms,
+        case_sensitive=True,
+        term_attributes=None,
+        limit=None,
+    ):
         # If no terms are provided to match on, do not attempt highlighting
         if not terms:
             return escape(doc)
 
+        limit = limit or -1
         term_attributes = term_attributes or {}
         token_pairs = self._token_pairs(doc, case_sensitive)
 
@@ -149,10 +157,8 @@ class HashedIXSearch(object):
         for unstemmed_token, stemmed_token in token_pairs:
 
             # Advance the match window for each candidate term
-            if not _is_separator(stemmed_token):
-                candidates = candidates or {
-                    term: term for term in terms if term
-                }
+            if not _is_separator(stemmed_token) and not limit == 0:
+                candidates = candidates or {term: term for term in terms if term}
                 candidates = {
                     term: tokens[1:]
                     for term, tokens in candidates.items()
@@ -175,6 +181,7 @@ class HashedIXSearch(object):
             if emit:
                 attributes = term_attributes.get(emit)
                 output = _render_match(accumulator, attributes)
+                limit -= 1
                 candidates = {}
                 accumulator = StringIO()
 
