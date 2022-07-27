@@ -58,16 +58,6 @@ class TestSearch(unittest.TestCase):
         self.assertEqual(len(results), 2)
         self.assertTrue(all([hits for hits in results]))
 
-    def test_analysis_consistency(self):
-        doc = "soymilk"
-        synonym = "soy milk"
-
-        index = HashedIXSearch(synonyms={doc: synonym})
-        index.add(0, "soymilk")
-        hits = index.query("soy milk")
-
-        self.assertTrue(list(hits))
-
     def test_exact_match(self):
         doc = "whole onion"
         stopwords = ["whole"]
@@ -204,17 +194,6 @@ class TestSearch(unittest.TestCase):
         self.assertEqual(
             markup, "sliced <mark>red bell pepper</mark> as filling"
         )
-
-    def test_synonym_highlighting(self):
-        doc = "soymilk."
-        term = ("soy", "milk")
-
-        stemmer = self.NaivePluralStemmer()
-        synonyms = {"soymilk": "soy milk"}
-        index = HashedIXSearch(stemmer=stemmer, synonyms=synonyms)
-        markup = index.highlight(doc, [term])
-
-        self.assertEqual(markup, "<mark>soy milk</mark>.")
 
     def test_phrase_multi_term_highlighting(self):
         doc = "put the skewer in the frying pan"

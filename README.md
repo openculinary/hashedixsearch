@@ -1,6 +1,6 @@
 # hashedixsearch
 
-`hashedixsearch` is a lightweight in-process search engine for Python, with support for stemming, synonyms, custom token analyzers, and query match highlighting.
+`hashedixsearch` is a lightweight in-process search engine for Python, with support for stemming, custom token analyzers, and query match highlighting.
 
 ## Usage
 
@@ -9,10 +9,10 @@ from hashedixsearch import HashedIXSearch
 
 doc = 'find the needle in the haystack'
 
-index = HashedIXSearch(synonyms={'search': 'find'})
+index = HashedIXSearch()
 index.add(doc_id=1, doc=doc)
 
-results = index.query_batch(['search'])
+results = index.query_batch(['find'])
 for query, hits in results:
     for hit in hits:
         # <mark>find</mark> the needle in the haystack

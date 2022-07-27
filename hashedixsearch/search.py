@@ -5,7 +5,6 @@ from xml.sax.saxutils import escape
 from hashedindex import HashedIndex
 from hashedindex.textparser import word_tokenize
 
-from hashedixsearch.analysis import SynonymAnalyzer
 from hashedixsearch._utils import (
     _is_separator,
     _render_match,
@@ -18,7 +17,6 @@ class HashedIXSearch(object):
         ngrams=4,
         stemmer=None,
         stopwords=None,
-        synonyms=None,
         casing=False,
         punctuation=False,
         whitespace=False,
@@ -27,7 +25,6 @@ class HashedIXSearch(object):
         self.ngrams = ngrams
         self.stemmer = stemmer
         self.stopwords = stopwords
-        self.synonyms = synonyms
         self.casing = casing
         self.punctuation = punctuation
         self.whitespace = whitespace
@@ -36,14 +33,9 @@ class HashedIXSearch(object):
         ngrams = kwargs.get("ngrams", self.ngrams)
         stemmer = kwargs.get("stemmer", self.stemmer)
         stopwords = kwargs.get("stopwords", self.stopwords)
-        synonyms = kwargs.get("synonyms", self.synonyms)
         casing = kwargs.get("casing", self.casing)
         punctuation = kwargs.get("punctuation", self.punctuation)
         whitespace = kwargs.get("whitespace", self.whitespace)
-
-        if synonyms:
-            analyzer = SynonymAnalyzer(synonyms)
-            doc = str().join(analyzer.process(doc))
 
         for ngrams in range(ngrams, 0, -1):
             yield from word_tokenize(
