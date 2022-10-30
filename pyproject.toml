@@ -17,6 +17,7 @@ license = { text = "AGPL-3.0-or-later" }
 name = "hashedixsearch"
 readme = { content-type = "text/markdown", file = "README.md" }
 requires-python = ">= 3.8"
+urls = { Homepage = "https://pypi.org/project/hashedixsearch/", Source = "https://github.com/openculinary/hashedixsearch.git/" }
 version = "1.2.1"
 
 [tool.setuptools]
