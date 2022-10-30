@@ -10,7 +10,7 @@ def _is_separator(token):
     return False
 
 
-def _render_match(cstring, attributes):
+def _render_match(match, attributes):
     element = Element("mark", attributes or {})
-    element.text = cstring.getvalue()
+    element.text = match
     return tostring(element, encoding="unicode")

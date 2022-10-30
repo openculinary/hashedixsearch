@@ -1,5 +1,4 @@
 from collections import defaultdict
-from io import StringIO
 from xml.sax.saxutils import escape
 
 from hashedindex import HashedIndex
@@ -143,8 +142,8 @@ class HashedIXSearch(object):
 
         # Build up a marked-up representation of the original document
         candidates = {}
-        accumulator = StringIO()
-        markup = StringIO()
+        accumulator = ""
+        markup = ""
 
         for unstemmed_token, stemmed_token in token_pairs:
 
@@ -158,15 +157,15 @@ class HashedIXSearch(object):
                 }
 
             # We had a partial match, but it was lost
-            if accumulator.tell() and not candidates:
-                markup.write(accumulator.getvalue())
-                accumulator = StringIO()
+            if accumulator and not candidates:
+                markup += accumulator
+                accumulator = ""
 
             # Prepare the current token for output, and write it to the
             # accumulator buffer if we are within candidate highlight tokens
             output = escape(unstemmed_token)
             if candidates:
-                accumulator.write(output)
+                accumulator += output
 
             # Render highlight markup once a candidate's terms are consumed
             emit = next(filter(lambda k: not candidates[k], candidates), None)
@@ -175,11 +174,10 @@ class HashedIXSearch(object):
                 output = _render_match(accumulator, attributes)
                 limit -= 1
                 candidates = {}
-                accumulator = StringIO()
+                accumulator = ""
 
             # Write output to the markup stream when match candidates are empty
             if not candidates:
-                markup.write(output)
+                markup += output
 
-        markup.write(accumulator.getvalue())
-        return markup.getvalue()
+        return markup + accumulator
