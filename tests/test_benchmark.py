@@ -62,7 +62,12 @@ class TestBenchmark(unittest.TestCase):
         for doc_id, doc in enumerate(self.documents):
             index.add(doc_id, doc)
 
-        for query in self.queries:
+        for query_id, query in enumerate(self.queries):
             index.query(query, query_limit=5)
             hits = index.query(query, query_limit=-1)
             self.assertTrue(hits or query in ["mushroom", "nonexistent"], query)
+
+            if not hits:
+                continue
+
+            index.highlight(doc=self.documents[query_id], terms=hits[0]["terms"])
