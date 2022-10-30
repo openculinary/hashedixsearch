@@ -1,5 +1,4 @@
 from string import punctuation
-from xml.etree.ElementTree import Element, tostring
 
 
 def _is_separator(token):
@@ -11,6 +10,6 @@ def _is_separator(token):
 
 
 def _render_match(match, attributes):
-    element = Element("mark", attributes or {})
-    element.text = match
-    return tostring(element, encoding="unicode")
+    attributes = attributes or {}
+    attribs = "".join(f' {key}="{value}"' for key, value in attributes.items())
+    return f"<mark{attribs}>{match}</mark>"
