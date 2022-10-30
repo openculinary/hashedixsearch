@@ -10,7 +10,7 @@ from hashedixsearch._utils import (
 )
 
 
-class HashedIXSearch(object):
+class HashedIXSearch:
     def __init__(
         self,
         ngrams=4,
