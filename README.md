@@ -19,12 +19,4 @@ for query, hits in results:
         markup = index.highlight(doc=doc, terms=hit['terms'])
 ```
 
-## Tests
-
-To run the `hashedixsearch` test suite:
-
-```bash
-$ python -m unittest
-```
-
 This library uses [hashedindex](https://github.com/MichaelAquilina/hashedindex) for tokenization and indexing.

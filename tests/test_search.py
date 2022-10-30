@@ -191,9 +191,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch()
         markup = index.highlight(doc, [term])
 
-        self.assertEqual(
-            markup, "sliced <mark>red bell pepper</mark> as filling"
-        )
+        self.assertEqual(markup, "sliced <mark>red bell pepper</mark> as filling")
 
     def test_phrase_multi_term_highlighting(self):
         doc = "put the skewer in the frying pan"
@@ -297,9 +295,7 @@ class TestSearch(unittest.TestCase):
         index = HashedIXSearch()
         markup = index.highlight(doc, terms, term_attributes=term_attributes)
 
-        self.assertEqual(
-            markup, 'place in the <mark id="example">bread maker</mark>'
-        )
+        self.assertEqual(markup, 'place in the <mark id="example">bread maker</mark>')
 
     def test_hit_scoring(self):
         precise_match = "garlic"
