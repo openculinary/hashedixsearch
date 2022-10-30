@@ -13,7 +13,7 @@ dependencies = [
     "hashedindex >= 0.10.0"
 ]
 description = "in-process search-engine for python"
-license = { file = "LICENSE" }
+license = { text = "AGPL-3.0-or-later" }
 name = "hashedixsearch"
 readme = { content-type = "text/markdown", file = "README.md" }
 requires-python = ">= 3.8"
