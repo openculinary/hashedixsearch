@@ -93,12 +93,13 @@ class HashedIXSearch:
 
     def query_exact(self, term):
         if term not in self.index:
-            return
+            return None
         for doc_id in self.index.get_documents(term):
             frequency = self.index.get_term_frequency(term, doc_id)
             doc_length = self.index.get_document_length(doc_id)
             if frequency == doc_length:
                 return doc_id
+        return None
 
     def _token_pairs(self, doc, case_sensitive):
         unstemmed_tokens = self.tokenize(
