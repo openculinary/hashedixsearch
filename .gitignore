@@ -1,5 +1,5 @@
 *.pyc
 *.swp
-dist
+*.whl
+.tox
 hashedixsearch.egg-info
-venv
