@@ -12,7 +12,7 @@ doc = 'find the needle in the haystack'
 index = HashedIXSearch()
 index.add(doc_id=1, doc=doc)
 
-results = index.query_batch(['find'])
+results = index.query('find')
 for query, hits in results:
     for hit in hits:
         # <mark>find</mark> the needle in the haystack
