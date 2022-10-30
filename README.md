@@ -19,4 +19,4 @@ for query, hits in results:
         markup = index.highlight(doc=doc, terms=hit['terms'])
 ```
 
-This library uses [hashedindex](https://github.com/MichaelAquilina/hashedindex) for tokenization and indexing.
+This library uses [hashedindex](https://github.com/MichaelAquilina/hashedindex.git/) for tokenization and indexing.
