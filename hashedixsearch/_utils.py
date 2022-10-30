@@ -4,7 +4,7 @@ from string import punctuation
 def _is_separator(token):
     if token.isspace():
         return True
-    if token.strip(punctuation) == str():
+    if not token.strip(punctuation):
         return True
     return False
 
