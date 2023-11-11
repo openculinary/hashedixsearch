@@ -4,7 +4,6 @@ from hashedixsearch.search import HashedIXSearch
 
 
 class TestBenchmark(unittest.TestCase):
-
     documents = [
         "red bell pepper diced",
         "onions",

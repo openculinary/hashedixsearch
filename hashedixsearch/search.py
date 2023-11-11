@@ -147,7 +147,6 @@ class HashedIXSearch:
         markup = ""
 
         for unstemmed_token, stemmed_token in token_pairs:
-
             # Advance the match window for each candidate term
             if not _is_separator(stemmed_token) and limit != 0:
                 candidates = candidates or {term: term for term in terms if term}
