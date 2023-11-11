@@ -58,9 +58,9 @@ class HashedIXSearch:
             self.index.add_term_occurrence(term, doc_id, count=count)
 
     def query(self, query, query_limit=1, **kwargs):
-        count = defaultdict(lambda: 0)
         hits = defaultdict(lambda: 0)
         terms = defaultdict(lambda: [])
+        term_frequencies = defaultdict(lambda: 0)
 
         for query_count, term in enumerate(self.tokenize(doc=query, **kwargs)):
             if query_count == query_limit:
@@ -72,18 +72,18 @@ class HashedIXSearch:
                 tf = self.index.get_term_frequency(term, doc_id)
                 hits[doc_id] += len(term) * tf / doc_length
                 terms[doc_id].append(term)
-                count[doc_id] += tf
+                term_frequencies[doc_id] += tf
         return sorted(
             [
                 {
                     "doc_id": doc_id,
                     "score": score,
                     "terms": terms[doc_id],
-                    "count": count[doc_id],
+                    "term_frequencies": term_frequencies[doc_id],
                 }
                 for doc_id, score in hits.items()
             ],
-            key=lambda x: (x["score"], x["count"]),
+            key=lambda x: (x["score"], x["term_frequencies"]),
             reverse=True,
         )
 
