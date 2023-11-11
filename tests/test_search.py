@@ -324,7 +324,6 @@ class TestSearch(unittest.TestCase):
             self.assertEqual(len(hits), 2)
             self.assertEqual(hits[0]["doc_id"], 1)
 
-
     def test_multiterm_match_preference(self):
         uniterm_doc = "salsa"
         multiterm_doc = "salsa verde"
