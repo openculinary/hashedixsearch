@@ -323,6 +323,19 @@ class TestSearch(unittest.TestCase):
         self.assertEqual(len(hits), 2)
         self.assertEqual(hits[0]["doc_id"], 1)
 
+    def test_multiterm_match_preference(self):
+        uniterm_doc = "salsa"
+        multiterm_doc = "salsa verde"
+
+        index = HashedIXSearch()
+        index.add(0, uniterm_doc, count=5)
+        index.add(1, multiterm_doc)
+
+        hits = index.query("salsa verde (green salsa)", query_limit=-1)
+
+        self.assertEqual(len(hits), 2)
+        self.assertEqual(hits[0]["doc_id"], 1)
+
     def test_partial_phrase_reoccurrence(self):
         doc = "place the towel onto the place mat"
         term = ("place", "mat")
