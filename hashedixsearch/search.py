@@ -61,7 +61,6 @@ class HashedIXSearch:
         count = defaultdict(lambda: 0)
         hits = defaultdict(lambda: 0)
         terms = defaultdict(lambda: [])
-        term_frequencies = defaultdict(lambda: 0)
 
         for query_count, term in enumerate(self.tokenize(doc=query, **kwargs)):
             if query_count == query_limit:
@@ -74,7 +73,6 @@ class HashedIXSearch:
                 hits[doc_id] = max(len(term) * tf / doc_length, hits[doc_id])
                 terms[doc_id].append(term)
                 count[doc_id] = max(len(term), count[doc_id])
-                term_frequencies[doc_id] += tf
         return sorted(
             [
                 {
@@ -82,11 +80,10 @@ class HashedIXSearch:
                     "score": score * count[doc_id],
                     "terms": terms[doc_id],
                     "count": count[doc_id],
-                    "term_frequencies": term_frequencies[doc_id],
                 }
                 for doc_id, score in hits.items()
             ],
-            key=lambda x: (x["score"], x["count"], x["term_frequencies"]),
+            key=lambda x: (x["score"], x["count"]),
             reverse=True,
         )
 
