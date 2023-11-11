@@ -70,14 +70,14 @@ class HashedIXSearch:
             for doc_id in self.index.get_documents(term):
                 doc_length = self.index.get_document_length(doc_id)
                 tf = self.index.get_term_frequency(term, doc_id)
-                hits[doc_id] = max(len(term) * tf / doc_length, hits[doc_id])
                 terms[doc_id].append(term)
                 count[doc_id] = max(len(term), count[doc_id])
+                hits[doc_id] = max(len(term) * count[doc_id], hits[doc_id])
         return sorted(
             [
                 {
                     "doc_id": doc_id,
-                    "score": score * count[doc_id],
+                    "score": score,
                     "terms": terms[doc_id],
                     "count": count[doc_id],
                 }
