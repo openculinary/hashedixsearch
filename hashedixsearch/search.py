@@ -68,11 +68,13 @@ class HashedIXSearch:
             if term not in self.index:
                 continue
             for doc_id in self.index.get_documents(term):
+                if doc_id in hits:
+                    continue
                 doc_length = self.index.get_document_length(doc_id)
                 tf = self.index.get_term_frequency(term, doc_id)
-                hits[doc_id] = max(len(term) * tf / doc_length, hits[doc_id])
+                hits[doc_id] = len(term) * tf / doc_length
                 terms[doc_id].append(term)
-                count[doc_id] = max(len(term), count[doc_id])
+                count[doc_id] = len(term)
         return sorted(
             [
                 {
