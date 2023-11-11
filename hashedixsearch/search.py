@@ -1,4 +1,3 @@
-from collections import defaultdict
 from xml.sax.saxutils import escape
 
 from hashedindex import HashedIndex
@@ -58,21 +57,24 @@ class HashedIXSearch:
             self.index.add_term_occurrence(term, doc_id, count=count)
 
     def query(self, query, query_limit=1, **kwargs):
-        count = defaultdict(lambda: 0)
-        hits = defaultdict(lambda: 0)
-        terms = defaultdict(lambda: [])
-
+        hits, count, terms = {}, {}, {}
         for query_count, term in enumerate(self.tokenize(doc=query, **kwargs)):
             if query_count == query_limit:
                 break
             if term not in self.index:
                 continue
             for doc_id in self.index.get_documents(term):
+                # If we have already seen this doc_id, then we must have previously
+                # found another matching term -- tokenized from the query -- that
+                # must be a better-quality match for it than this shorter one.
+                if doc_id in hits:
+                    continue
+
                 doc_length = self.index.get_document_length(doc_id)
                 tf = self.index.get_term_frequency(term, doc_id)
-                hits[doc_id] = max(len(term) * tf / doc_length, hits[doc_id])
-                terms[doc_id].append(term)
-                count[doc_id] = max(len(term), count[doc_id])
+                hits[doc_id] = len(term) * tf / doc_length
+                count[doc_id] = len(term)
+                terms[doc_id] = [term]
         return sorted(
             [
                 {
