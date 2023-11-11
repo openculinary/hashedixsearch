@@ -318,10 +318,12 @@ class TestSearch(unittest.TestCase):
         index.add(0, infrequent_doc)
         index.add(1, frequent_doc, count=5)
 
-        hits = index.query("garlic clove", query_limit=-1)
+        for query in ("garlic clove", "clove garlic"):
+            hits = index.query(query, query_limit=-1)
 
-        self.assertEqual(len(hits), 2)
-        self.assertEqual(hits[0]["doc_id"], 1)
+            self.assertEqual(len(hits), 2)
+            self.assertEqual(hits[0]["doc_id"], 1)
+
 
     def test_multiterm_match_preference(self):
         uniterm_doc = "salsa"
