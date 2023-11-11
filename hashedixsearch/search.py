@@ -79,7 +79,7 @@ class HashedIXSearch:
             [
                 {
                     "doc_id": doc_id,
-                    "score": score,
+                    "score": score * count[doc_id],
                     "terms": terms[doc_id],
                     "count": count[doc_id],
                     "term_frequencies": term_frequencies[doc_id],
