@@ -57,7 +57,7 @@ class HashedIXSearch:
             self.index.add_term_occurrence(term, doc_id, count=count)
 
     def query(self, query, query_limit=1, **kwargs):
-        hits, count, terms = {}, {}, {}
+        results = {}
         for query_count, term in enumerate(self.tokenize(doc=query, **kwargs)):
             if query_count == query_limit:
                 break
@@ -67,22 +67,17 @@ class HashedIXSearch:
                 # If we have already seen this doc_id, then we must have previously
                 # found another matching term -- tokenized from the query -- that
                 # must be a better-quality match for it than this shorter one.
-                if doc_id in hits:
+                if doc_id in results:
                     continue
 
-                hits[doc_id] = len(term)
-                count[doc_id] = self.index.get_term_frequency(term, doc_id)
-                terms[doc_id] = [term]
-        return sorted(
-            [
-                {
+                results[doc_id] = {
                     "doc_id": doc_id,
-                    "score": hits[doc_id],
-                    "terms": terms[doc_id],
-                    "count": count[doc_id],
+                    "score": len(term),
+                    "count": self.index.get_term_frequency(term, doc_id),
+                    "terms": [term],
                 }
-                for doc_id, score in hits.items()
-            ],
+        return sorted(
+            results.values(),
             key=lambda x: (x["score"], x["count"]),
             reverse=True,
         )
