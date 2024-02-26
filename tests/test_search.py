@@ -6,12 +6,12 @@ from hashedixsearch.search import HashedIXSearch
 
 
 class TestSearch(unittest.TestCase):
-    class NaivePluralStemmer(object):
+    class NaivePluralStemmer:
         @staticmethod
         def stem(word):
             return word.rstrip("s")
 
-    class UnidecodeStemmer(object):
+    class UnidecodeStemmer:
         @staticmethod
         def stem(word):
             return unidecode(word)
